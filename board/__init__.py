@@ -7,6 +7,9 @@ from .assets import extract_piece as _extract_piece
 from .mapping import get_square_pos as _get_square_pos
 from .mapping import get_square_from_click as _get_square_from_click
 
+COLOR_WHITE_SQUARE = "#B3B6B7"
+COLOR_BLACK_SQUARE = "#A04000"
+
 square_to_radius_ratio = 4
 square_to_arrow_width_ratio = 5
 hold_size_ratio = 1.5
@@ -272,9 +275,9 @@ def _draw_board(root, case_size):
     for i in range(8):
         for j in range(8):
             if (i+j) % 2:
-                color = "#A04000"
+                color = COLOR_WHITE_SQUARE
             else:
-                color = "#B3B6B7"
+                color = COLOR_BLACK_SQUARE
             canvas.create_rectangle(i*case_size, j*case_size,
                                 (i+1)*case_size, (j+1)*case_size,
                                 fill=color, outline="")
