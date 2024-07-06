@@ -4,8 +4,8 @@ import chess
 from .assets import load_chess_pieces as _load_chess_pieces
 from .assets import load_chess_pieces_rect as _load_chess_pieces_rect
 from .assets import extract_piece as _extract_piece
-from .maping import get_square_pos as _get_square_pos
-from .maping import get_square_from_click as _get_square_from_click
+from .mapping import get_square_pos as _get_square_pos
+from .mapping import get_square_from_click as _get_square_from_click
 
 square_to_radius_ratio = 4
 square_to_arrow_width_ratio = 5
@@ -35,13 +35,13 @@ class ChessBoard:
         
         self._button3 = None
         
-        self.canvas.bind("<ButtonPress-3>", self.clickPress3)
-        self.canvas.bind("<ButtonRelease-3>", self.clickRelease3)
+        self.canvas.bind("<ButtonPress-3>", self._clickPress3)
+        self.canvas.bind("<ButtonRelease-3>", self._clickRelease3)
         
-        self.canvas.bind("<ButtonPress-1>", self.clickPress1)
-        self.canvas.bind("<ButtonRelease-1>", self.clickRelease1)
+        self.canvas.bind("<ButtonPress-1>", self._clickPress1)
+        self.canvas.bind("<ButtonRelease-1>", self._clickRelease1)
         
-        self.canvas.bind("<B1-Motion>", self.motion)
+        self.canvas.bind("<B1-Motion>", self._motion)
         
         self._promotion_frame = tk.Frame(root)
         self._Promotion_frame = tk.Frame(root)
@@ -84,7 +84,7 @@ class ChessBoard:
         self._button_window = None
         self._promotion_move = None
     
-    def draw_piece(self, piece, square, scale):
+    def _draw_piece(self, piece, square, scale):
         piece_image = _extract_piece(self._chess_pieces, self._chess_pieces_rect[piece], int(scale*self.square_size))
         tk_piece_image = self.canvas.create_image(_get_square_pos(square, self.square_size, self.is_flipped), image=piece_image, anchor=tk.NW)
         self._square_images[square] = (tk_piece_image, piece_image)
@@ -99,7 +99,7 @@ class ChessBoard:
             if piece.isdigit():
                 square += int(piece)
             else:
-                self.draw_piece(piece, square, 1)
+                self._draw_piece(piece, square, 1)
                 square += 1
     
     def arrow(self, start, end):
@@ -120,7 +120,7 @@ class ChessBoard:
         line = self.canvas.create_line(*points, arrow=tk.LAST, width=self.square_size//square_to_arrow_width_ratio, fill="orange", stipple="gray50")
         self._arrow_line.append(line)
     
-    def clickRelease1(self, event):
+    def _clickRelease1(self, event):
         if self.locked:
             return
         
@@ -134,11 +134,11 @@ class ChessBoard:
             self.hold = False
         return legal
     
-    def clickPress1(self, event):
+    def _clickPress1(self, event):
         if self.locked:
             return
         
-        flag = self.clickRelease1(event)
+        flag = self._clickRelease1(event)
         if flag:
             return
         
@@ -155,8 +155,8 @@ class ChessBoard:
             self.selected_square = square
             self.hold = True
             
-            self.draw_piece(piece.symbol(), square, hold_size_ratio)
-            self.motion(event)
+            self._draw_piece(piece.symbol(), square, hold_size_ratio)
+            self._motion(event)
             
             legal_moves = self.board.legal_moves
             possible_moves = [move.to_square for move in legal_moves if move.from_square == square]
@@ -168,20 +168,20 @@ class ChessBoard:
                 circle = self.canvas.create_oval(x, y, x+2*r, y+2*r, fill="grey", stipple="gray50")
                 self._circle.append(circle)
     
-    def clickPress3(self, event):
+    def _clickPress3(self, event):
         if self.locked:
             return
         
         square = _get_square_from_click(event.x, event.y, self.square_size, self.is_flipped)
         self._button3 = square
     
-    def clickRelease3(self, event):
+    def _clickRelease3(self, event):
         if self.locked:
             return
         square = _get_square_from_click(event.x, event.y, self.square_size, self.is_flipped)
         self.arrow(self._button3, square)
     
-    def motion(self, event):
+    def _motion(self, event):
         if self.locked:
             return
         if self.hold:
@@ -190,7 +190,7 @@ class ChessBoard:
             self.canvas.moveto(image_id, event.x - ofset, event.y - ofset)
             self.canvas.update()
     
-    def promotion_panel(self, move):
+    def _promotion_panel(self, move):
         if self.board.turn:
             panel = self._Promotion_frame
         else:
@@ -248,13 +248,18 @@ class ChessBoard:
         else:
             move.promotion = chess.QUEEN
             if self.board.is_legal(move):
-                self.promotion_panel(move)
+                self._promotion_panel(move)
                 self.board.push(move)
+                flag = True
         self.draw()
         return flag
 
     def back(self):
         self.board.pop()
+        self.draw()
+    
+    def flip(self):
+        self.is_flipped = not self.is_flipped
         self.draw()
     
     def reset(self):
