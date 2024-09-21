@@ -1,7 +1,7 @@
 import chess
 
 import opening
-
+import utils
 def test_node_eq():
     root1 = opening.Node()
     root2 = opening.Node()
@@ -49,7 +49,7 @@ def test_get_position():
     board = chess.Board()
     board.push(move1)
     board.push(move2)
-    true_position = board.fen().split("-")[0]
+    true_position = utils.get_position(board)
     
     assert position == true_position, "The get_position method is not working."
 

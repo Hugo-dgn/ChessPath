@@ -268,6 +268,9 @@ class ChessBoard:
     def reset(self):
         self.board.reset()
         self.draw()
+    
+    def move_stack(self):
+        return self.board.move_stack
 
 def _draw_board(root, case_size):
     canvas = tk.Canvas(root, width=case_size*8,

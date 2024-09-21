@@ -1,5 +1,7 @@
 import chess
 
+import utils
+
 class Node:
     
     def __init__(self) -> None:
@@ -82,7 +84,7 @@ class Node:
         for move in moves:
             board.push(move)
         
-        return board.fen().split("-")[0]
+        return utils.get_position(board)
 
     def root(self) -> 'Node':
         node = self

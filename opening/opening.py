@@ -29,7 +29,19 @@ class Opening:
         self.cursor.delete_child(move)
         return self.cursor
     
+    def next(self) -> list:
+        return self.cursor.get_moves()
+    
     def back(self) -> Node:
         move = self.board.pop()
         self.cursor = self.cursor.back(move)
         return self.cursor
+
+    def move(self, move : chess.Move) -> Node:
+        if not self.board.is_legal(move):
+            raise ValueError("The move is not legal.")
+        flag = move in self.cursor.get_moves()
+        if flag:
+            self.board.push(move)
+            self.cursor = self.cursor.push(move)
+        return flag
