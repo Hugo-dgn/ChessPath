@@ -13,6 +13,7 @@ class Opening:
     
     def root(self) -> Node:
         self.cursor = self.tree
+        self.board = chess.Board()
         return self.tree
 
     def push(self, move : chess.Move) -> Node:
