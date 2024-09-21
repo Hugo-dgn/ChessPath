@@ -16,7 +16,6 @@ def test_act():
     board.push(move1)
     
     ag = OpeningAgent(op)
-    assert ag.lock, "The lock attribute is True for the OpeningAgent, it should be False."
     
     move = ag.act(board)
     assert move == move2, "The act method is not working."

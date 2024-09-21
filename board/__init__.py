@@ -86,6 +86,8 @@ class ChessBoard:
         
         self._button_window = None
         self._promotion_move = None
+        
+        self.root.after(1000, lambda: self.root.event_generate("<<Start>>"))
     
     def _draw_piece(self, piece, square, scale):
         piece_image = _extract_piece(self._chess_pieces, self._chess_pieces_rect[piece], int(scale*self.square_size))
@@ -246,7 +248,6 @@ class ChessBoard:
             for circle in self._circle:
                 self.canvas.delete(circle)
             self.board.push(move)
-            self.root.event_generate("<<MoveConfirmation>>")
             flag = True
         else:
             move.promotion = chess.QUEEN
@@ -254,6 +255,9 @@ class ChessBoard:
                 self._promotion_panel(move)
                 self.board.push(move)
                 flag = True
+        
+        if flag:
+            self.root.event_generate("<<MoveConfirmation>>")
         self.draw()
         return flag
 
@@ -268,9 +272,6 @@ class ChessBoard:
     def reset(self):
         self.board.reset()
         self.draw()
-    
-    def move_stack(self):
-        return self.board.move_stack
 
 def _draw_board(root, case_size):
     canvas = tk.Canvas(root, width=case_size*8,
