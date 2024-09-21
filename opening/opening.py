@@ -46,3 +46,31 @@ class Opening:
             self.board.push(move)
             self.cursor = self.cursor.push(move)
         return flag
+    
+    def __eq__(self, other: object) -> bool:
+        flag = self.name == other.name and self.color == other.color
+        if not flag:
+            return False
+        stack = [self.tree]
+        
+        _buffer_cursor1 = self.cursor
+        _buffer_cursor2 = other.cursor
+        
+        self.root()
+        other.root()
+        flag = True
+        while len(stack) > 0 and flag:
+            node = stack.pop()
+            moves_1 = set(node.get_moves())
+            moves_2 = set(other.cursor.get_moves())
+            if moves_1 != moves_2:
+                flag = False
+            
+            children = node.get_children()
+            if children is not None:
+                stack.extend(children)
+        
+        self.cursor = _buffer_cursor1
+        other.cursor = _buffer_cursor2
+        return flag
+        
