@@ -104,6 +104,11 @@ class Link:
         self.visits = 0
         self.successes = 0
     
+    def get_success_rate(self) -> float:
+        if self.visits == 0:
+            return 0
+        return self.successes / self.visits
+    
     def __eq__(self, other):
         return self.move == other.move
 

@@ -12,6 +12,7 @@ class Player:
         self.root.bind("<<MoveConfirmation>>", lambda event : self.move(event, False))
         self.root.bind("<Left>", self.back)
         self.root.bind("<Right>", self.forward)
+        self.root.bind("<r>", self.reset)
         
         self.lock = False
     
@@ -37,14 +38,17 @@ class Player:
         self.lock = True
         _board  = self.board.board.copy()
         last_move = _board.pop()
-        flag = self.move_confirmation(_board, last_move)
-        if not flag:
+        flag1 = self.move_confirmation(_board, last_move)
+        if not flag1:
             self.board.back()
         
         move = self.agent_action(forward)
         self.lock = False
-        if move is not None:
+        flag2 = move is not None
+        if flag2:
             self.board.push(move)
+        
+        return flag1, flag2
     
     def start(self, event, forward):
         move = self.agent_action(forward)
@@ -66,3 +70,8 @@ class Player:
         else:
             flag = self.blackAgent.is_possible_action(board, move)
         return flag
+
+    def reset(self, event):
+        self.board.reset()
+        self.root.event_generate("<<Reset>>")
+        self.lock = False

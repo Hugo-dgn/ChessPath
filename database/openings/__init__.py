@@ -1,1 +1,1 @@
-from .opDatabase import reset, table, save, load, openings
+from .opDatabase import reset, table, save, load, openings, delete

@@ -36,7 +36,7 @@ def openings():
     return names
     
 
-def save(opening):
+def save(opening, overwrite=False):
     tables = list_tables()
     if ('openings',) not in tables:
         reset()
@@ -48,11 +48,23 @@ def save(opening):
     conn = utils.create_connection(OPENING_FILE)
     cur = conn.cursor()
     serialized_tree = pickle.dumps(tree)
-    cur.execute("UPDATE openings SET tree = ? WHERE color = ? AND name = ?", (serialized_tree, color, name))
-    if cur.rowcount == 0:
+    if overwrite:
+        cur.execute("UPDATE openings SET tree = ? WHERE color = ? AND name = ?", (serialized_tree, color, name))
+        if cur.rowcount == 0:
+            cur.execute("INSERT INTO openings (name, color, tree) VALUES (?, ?, ?)", (name, color, serialized_tree))
+    else:
+        cur.execute("SELECT * FROM openings WHERE name = ? AND color = ?", (name, color))
+        if cur.fetchone() is not None:
+            print("Opening already exists")
+            return
         cur.execute("INSERT INTO openings (name, color, tree) VALUES (?, ?, ?)", (name, color, serialized_tree))
-    
     cur.close()
+    conn.commit()
+
+def delete(name, color):
+    conn = utils.create_connection(OPENING_FILE)
+    cur = conn.cursor()
+    cur.execute("DELETE FROM openings WHERE name = ? AND color = ?", (name, color))
     conn.commit()
 
 

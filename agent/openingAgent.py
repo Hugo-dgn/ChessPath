@@ -9,6 +9,10 @@ class OpeningAgent(Agent):
     def __init__(self, opening):
         Agent.__init__(self)
         self.opening = opening
+        self.score_function = op.depthScore
+    
+    def set_score_function(self, score_function):
+        self.score_function = score_function
     
     def is_possible_action(self, board, move):
         moves = self.possible_actions(board)
@@ -20,7 +24,7 @@ class OpeningAgent(Agent):
             return None
         if forwardCall:
             node = self.opening.cursor
-            move = op.depthScore(node)
+            move = self.score_function(node)
         else:
             move = random.choice(next_moves)
         return move
