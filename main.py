@@ -69,9 +69,11 @@ def db_command(args):
     if args.name == "op":
         if args.command == "reset":
             database.openings.reset()
-        elif args.command == "tables":
-            tables = database.openings.tables()
-            print(tables)
+        elif args.command == "table":
+            df = database.openings.table("openings")
+            df = df.drop(columns=['tree'])
+            df['color'] = df['color'].replace({1: 'white', 0: 'black'})
+            print(df.head())
         elif args.command == "names":
             names = database.openings.openings()
             print(names)
@@ -97,7 +99,7 @@ if __name__ == "__main__":
     db_parser = subparsers.add_parser("db", help="Database")
     db_subparsers = db_parser.add_subparsers(dest="name")
     db_op_subparsers = db_subparsers.add_parser("op", help="Openings")
-    db_op_subparsers.add_argument("command", choices = ["reset", "tables", "names"])
+    db_op_subparsers.add_argument("command", choices = ["reset", "table", "names"])
     db_parser.set_defaults(func=db_command)
     
     

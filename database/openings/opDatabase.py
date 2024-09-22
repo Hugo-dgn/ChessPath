@@ -1,9 +1,15 @@
 import pickle
+import pandas as pd
 
 import opening
 import database.utils as utils
 
 OPENING_FILE = 'database/openings.db'
+
+def list_tables():
+    conn = utils.create_connection(OPENING_FILE)
+    rows = utils.list_table(conn)
+    return rows
 
 def reset():
     conn = utils.create_connection(OPENING_FILE)
@@ -13,10 +19,14 @@ def reset():
     conn.commit()
     conn.close()
 
-def tables():
+def table(name):
+    tables = list_tables()
+    if (name,) not in tables:
+        assert False, f"Table {name} not found"
     conn = utils.create_connection(OPENING_FILE)
-    rows = utils.list_table(conn)
-    return rows
+    query = f"SELECT * FROM {name}"
+    df = pd.read_sql_query(query, conn)
+    return df
 
 def openings():
     conn = utils.create_connection(OPENING_FILE)
@@ -27,8 +37,8 @@ def openings():
     
 
 def save(opening):
-    list_tables = tables()
-    if ('openings',) not in list_tables:
+    tables = list_tables()
+    if ('openings',) not in tables:
         reset()
     name = opening.name
     color = opening.color
