@@ -1,5 +1,7 @@
 import random
 
+import opening as op
+
 from .superAgent import Agent
 
 class OpeningAgent(Agent):
@@ -16,7 +18,11 @@ class OpeningAgent(Agent):
         next_moves = self.possible_actions(board)
         if len(next_moves) == 0:
             return None
-        move = random.choice(next_moves)
+        if forwardCall:
+            node = self.opening.cursor
+            move = op.depthScore(node)
+        else:
+            move = random.choice(next_moves)
         return move
     
     def possible_actions(self, board):
