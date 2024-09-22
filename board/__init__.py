@@ -11,7 +11,7 @@ COLOR_WHITE_SQUARE = "#B3B6B7"
 COLOR_BLACK_SQUARE = "#A04000"
 
 square_to_radius_ratio = 4
-square_to_arrow_width_ratio = 5
+square_to_arrow_width_ratio = 3
 hold_size_ratio = 1.5
 
 class ChessBoard:
@@ -35,6 +35,7 @@ class ChessBoard:
         self._square_images = [None]*64
         self._arrow_line = []
         self._circle = []
+        self._highlight = []
         
         self._button3 = None
         
@@ -91,7 +92,7 @@ class ChessBoard:
     
     def _draw_piece(self, piece, square, scale):
         piece_image = _extract_piece(self._chess_pieces, self._chess_pieces_rect[piece], int(scale*self.square_size))
-        tk_piece_image = self.canvas.create_image(_get_square_pos(square, self.square_size, self.is_flipped), image=piece_image, anchor=tk.NW)
+        tk_piece_image = self.canvas.create_image(_get_square_pos(square, self.square_size, self.is_flipped), image=piece_image, anchor=tk.NW, tag="piece")
         self._square_images[square] = (tk_piece_image, piece_image)
     
     def draw(self):
@@ -107,22 +108,54 @@ class ChessBoard:
                 self._draw_piece(piece, square, 1)
                 square += 1
     
+    def highlight(self, square):
+        x, y = _get_square_pos(square, self.square_size, self.is_flipped, center=True)
+        r = self.square_size//2
+        x -= r
+        y -= r
+        square = self.canvas.create_rectangle(x, y, x+2*r, y+2*r, fill="red", stipple="gray50", tags="highlight")
+        self._highlight.append(square)
+        self.canvas.tag_raise("piece")
+        self.canvas.tag_raise("arrow")
+    
     def arrow(self, start, end):
         start_loc = _get_square_pos(start, self.square_size, self.is_flipped, center=True)
         end_loc = _get_square_pos(end, self.square_size, self.is_flipped, center=True)
+        
         dx = abs(end_loc[0] - start_loc[0])//self.square_size
         dy = abs(end_loc[1] - start_loc[1])//self.square_size
 
-        points = [start_loc]
+        mid = None
         if (dx, dy) == (1, 2):
             mid = (start_loc[0], end_loc[1])
-            points.append(mid)
         elif (dx, dy) == (2, 1):
             mid = (end_loc[0], start_loc[1])
+        
+        if mid is not None:
+            direction_dx = (mid[0] - start_loc[0])//self.square_size
+            direction_dy = (mid[1] - start_loc[1])//self.square_size
+        else:
+            direction_dx = (end_loc[0] - start_loc[0])//self.square_size
+            direction_dy = (end_loc[1] - start_loc[1])//self.square_size
+        
+        start_loc = list(start_loc)
+        if direction_dx < 0:
+            start_loc[0] -= self.square_size/3
+        elif direction_dx > 0:
+            start_loc[0] += self.square_size/3
+        if direction_dy < 0:
+            start_loc[1] -= self.square_size/3
+        elif direction_dy > 0:
+            start_loc[1] += self.square_size/3
+            
+        points = [start_loc]
+        if mid is not None:
             points.append(mid)
         points.append(end_loc)
         
-        line = self.canvas.create_line(*points, arrow=tk.LAST, width=self.square_size//square_to_arrow_width_ratio, fill="orange", stipple="gray50")
+        arrow_width = self.square_size//square_to_arrow_width_ratio
+        arrow_shape = (arrow_width, arrow_width * 2, arrow_width // 2)
+        line = self.canvas.create_line(*points, arrow=tk.LAST, width=arrow_width, arrowshape=arrow_shape, fill="orange", stipple="gray75", tags="arrow")
         self._arrow_line.append(line)
     
     def _clickRelease1(self, event):
@@ -151,8 +184,12 @@ class ChessBoard:
             self.canvas.delete(line)
         for circle in self._circle:
             self.canvas.delete(circle)
+        for square in self._highlight:
+            self.canvas.delete(square)
         self._arrow_line = []
         self._circle = []
+        self._highlight = []
+
         
         square = _get_square_from_click(event.x, event.y, self.square_size, self.is_flipped)
         piece = self.board.piece_at(square)
@@ -184,7 +221,10 @@ class ChessBoard:
         if self.locked:
             return
         square = _get_square_from_click(event.x, event.y, self.square_size, self.is_flipped)
-        self.arrow(self._button3, square)
+        if self._button3 == square:
+            self.highlight(square)
+        else:
+            self.arrow(self._button3, square)
     
     def _motion(self, event):
         if self.locked:

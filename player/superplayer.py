@@ -8,10 +8,23 @@ class Player:
         self.blackAgent = blackAgent
         
         self.root = board.root
+        self.root.focus_set()
         self.root.bind("<<MoveConfirmation>>", self.move)
         self.root.bind("<<Start>>", self.start)
+        self.root.bind("<Left>", self.back)
+        self.root.bind("<Right>", self.forward)
         
         self.lock = False
+    
+    def forward(self, event):
+        self.root.event_generate("<<MoveConfirmation>>")
+    
+    def back(self, event):
+        if len(self.board.board.move_stack) == 0:
+            return
+        if self.lock:
+            return
+        self.board.back()
 
     def move(self, event):
         if self.lock:
