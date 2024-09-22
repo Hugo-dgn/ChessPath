@@ -6,7 +6,7 @@ import board
 import player
 import agent
 import database
-import database.openings
+import opening
 
 def get_board(args):
     root = tk.Tk()
@@ -67,8 +67,13 @@ def openingPlayer_window(args):
     op_player = player.Openingplayer(chess_board, args.opening, args.color)
     root.mainloop()
 
+def editor_window(args):
+    chess_board, root = get_board(args)
+    editor = player.Editor(chess_board, args.opening, args.color)
+    root.mainloop()
+
 def db_command(args):
-    if args.name == "op":
+    if args.tables == "op":
         if args.command == "reset":
             database.openings.reset()
         elif args.command == "table":
@@ -76,9 +81,9 @@ def db_command(args):
             df = df.drop(columns=['tree'])
             df['color'] = df['color'].replace({1: 'white', 0: 'black'})
             print(df.head())
-        elif args.command == "names":
-            names = database.openings.openings()
-            print(names)
+        elif args.command == "create":
+            op = opening.Opening(args.name, args.color, opening.Node())
+            database.openings.save(op)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chess game")
@@ -105,11 +110,25 @@ if __name__ == "__main__":
     openingPlayer_parser.add_argument("--fliped", action="store_true", help="Is the board fliped")
     openingPlayer_parser.set_defaults(func=openingPlayer_window)
     
+    editor_parser = subparsers.add_parser("editor", help="Opening editor")
+    editor_parser.add_argument("opening", type=str, help="name of the opening")
+    editor_parser.add_argument("color", type=bool, help="color of the player")
+    editor_parser.add_argument("--size", type=int, default=64, help="Size of a square")
+    editor_parser.add_argument("--fliped", action="store_true", help="Is the board fliped")
+    editor_parser.set_defaults(func=editor_window)
+    
     
     db_parser = subparsers.add_parser("db", help="Database")
-    db_subparsers = db_parser.add_subparsers(dest="name")
+    db_subparsers = db_parser.add_subparsers(dest="tables")
     db_op_subparsers = db_subparsers.add_parser("op", help="Openings")
-    db_op_subparsers.add_argument("command", choices = ["reset", "table", "names"])
+    
+    db_command_subparsers = db_op_subparsers.add_subparsers(dest="command")
+    db_command_subparsers.add_parser("reset", help="Reset the database")
+    db_command_subparsers.add_parser("table", help="List tables")
+    
+    create_parser = db_command_subparsers.add_parser("create", help="Create a new opening")
+    create_parser.add_argument("name", type=str, help="Name of the opening")
+    create_parser.add_argument("color", type=bool, help="Color of the opening")
     db_parser.set_defaults(func=db_command)
     
     

@@ -1,2 +1,3 @@
 from .superplayer import Player
-from .openingPlayer import Openingplayer
+from .openingPlayer import OpeningPlayer
+from .editor import Editor

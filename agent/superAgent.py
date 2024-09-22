@@ -3,11 +3,11 @@ class Agent:
     def __init__(self):
         pass
     
-    def act(self, board):
+    def act(self, board, forwardCall):
         pass
     
     def possible_actions(self, board):
-        return True
+        return [move for move in board.legal_moves]
 
     def is_possible_action(self, board, move):
         return True

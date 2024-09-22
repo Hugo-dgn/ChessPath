@@ -12,7 +12,7 @@ class OpeningAgent(Agent):
         moves = self.possible_actions(board)
         return move in moves
     
-    def act(self, board):
+    def act(self, board, forwardCall):
         next_moves = self.possible_actions(board)
         if len(next_moves) == 0:
             return None

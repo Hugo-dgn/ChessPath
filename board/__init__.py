@@ -11,7 +11,7 @@ COLOR_WHITE_SQUARE = "#B3B6B7"
 COLOR_BLACK_SQUARE = "#A04000"
 
 square_to_radius_ratio = 4
-square_to_arrow_width_ratio = 3
+square_to_arrow_width_ratio = 4
 hold_size_ratio = 1.5
 
 class ChessBoard:
@@ -34,6 +34,7 @@ class ChessBoard:
         self._chess_pieces_rect = _load_chess_pieces_rect()
         self._square_images = [None]*64
         self._arrow_line = []
+        self._persistent_arrow_line = []
         self._circle = []
         self._highlight = []
         
@@ -46,6 +47,9 @@ class ChessBoard:
         self.canvas.bind("<ButtonRelease-1>", self._clickRelease1)
         
         self.canvas.bind("<B1-Motion>", self._motion)
+        
+        #bind to c press
+        self.root.bind("<c>", self._clear)
         
         self._promotion_frame = tk.Frame(root)
         self._Promotion_frame = tk.Frame(root)
@@ -95,6 +99,10 @@ class ChessBoard:
         tk_piece_image = self.canvas.create_image(_get_square_pos(square, self.square_size, self.is_flipped), image=piece_image, anchor=tk.NW, tag="piece")
         self._square_images[square] = (tk_piece_image, piece_image)
     
+    def order_layer(self):
+        self.canvas.tag_raise("piece")
+        self.canvas.tag_raise("arrow")
+    
     def draw(self):
         position = "".join(reversed(self.board.epd().split()[0].split("/")))
         
@@ -107,6 +115,8 @@ class ChessBoard:
             else:
                 self._draw_piece(piece, square, 1)
                 square += 1
+        
+        self.order_layer()
     
     def highlight(self, square):
         x, y = _get_square_pos(square, self.square_size, self.is_flipped, center=True)
@@ -115,10 +125,9 @@ class ChessBoard:
         y -= r
         square = self.canvas.create_rectangle(x, y, x+2*r, y+2*r, fill="red", stipple="gray50", tags="highlight")
         self._highlight.append(square)
-        self.canvas.tag_raise("piece")
-        self.canvas.tag_raise("arrow")
+        self.order_layer()
     
-    def arrow(self, start, end):
+    def arrow(self, start, end, persistent=False):
         start_loc = _get_square_pos(start, self.square_size, self.is_flipped, center=True)
         end_loc = _get_square_pos(end, self.square_size, self.is_flipped, center=True)
         
@@ -156,7 +165,30 @@ class ChessBoard:
         arrow_width = self.square_size//square_to_arrow_width_ratio
         arrow_shape = (arrow_width, arrow_width * 2, arrow_width // 2)
         line = self.canvas.create_line(*points, arrow=tk.LAST, width=arrow_width, arrowshape=arrow_shape, fill="orange", stipple="gray75", tags="arrow")
-        self._arrow_line.append(line)
+        
+        if not persistent:
+            self._arrow_line.append(line)
+        else:
+            self._persistent_arrow_line.append(line)
+
+    def clear(self):
+        if self.locked:
+            return
+        for line in self._arrow_line:
+            self.canvas.delete(line)
+        for line in self._persistent_arrow_line:
+            self.canvas.delete(line)
+        for circle in self._circle:
+            self.canvas.delete(circle)
+        for square in self._highlight:
+            self.canvas.delete(square)
+        self._arrow_line = []
+        self._persistent_arrow_line = []
+        self._circle = []
+        self._highlight = []
+        
+    def _clear(self, event):
+        self.clear()
     
     def _clickRelease1(self, event):
         if self.locked:

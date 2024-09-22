@@ -9,15 +9,18 @@ class Player:
         
         self.root = board.root
         self.root.focus_set()
-        self.root.bind("<<MoveConfirmation>>", self.move)
-        self.root.bind("<<Start>>", self.start)
+        self.root.bind("<<MoveConfirmation>>", lambda event : self.move(event, False))
         self.root.bind("<Left>", self.back)
         self.root.bind("<Right>", self.forward)
         
         self.lock = False
     
     def forward(self, event):
-        self.root.event_generate("<<MoveConfirmation>>")
+        self.root.event_generate("<<ForwardCall>>")
+        if len(self.board.board.move_stack) == 0:
+            self.start(event, True)
+        else:
+            self.move(event, True)
     
     def back(self, event):
         if len(self.board.board.move_stack) == 0:
@@ -25,8 +28,9 @@ class Player:
         if self.lock:
             return
         self.board.back()
+        self.root.event_generate("<<MoveBack>>")
 
-    def move(self, event):
+    def move(self, event, forward):
         if self.lock:
             self.board.back()
             return
@@ -37,23 +41,22 @@ class Player:
         if not flag:
             self.board.back()
         
-        move = self.agent_action()
-        
+        move = self.agent_action(forward)
         self.lock = False
         if move is not None:
             self.board.push(move)
     
-    def start(self, event):
-        move = self.agent_action()
+    def start(self, event, forward):
+        move = self.agent_action(forward)
         if move is not None:
             self.board.push(move)
     
-    def agent_action(self):
+    def agent_action(self, forward):
         color = self.board.board.turn
         if color:
-            move = self.whiteAgent.act(self.board.board)
+            move = self.whiteAgent.act(self.board.board, forward)
         else:
-            move = self.blackAgent.act(self.board.board)
+            move = self.blackAgent.act(self.board.board, forward)
         return move
         
     def move_confirmation(self, board, move):
