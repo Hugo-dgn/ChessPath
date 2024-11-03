@@ -1,0 +1,10 @@
+chess==1.11.1
+numpy==1.24.4
+pandas==2.0.3
+pillow==10.4.0
+python-chess==1.999
+python-dateutil==2.9.0.post0
+pytz==2024.2
+PyYAML==6.0.2
+six==1.16.0
+tzdata==2024.2
