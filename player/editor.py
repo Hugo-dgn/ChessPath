@@ -11,6 +11,7 @@ class Editor(OpeningPlayer):
         OpeningPlayer.__init__(self, board, openingName, color)
         self.root.bind("<<MoveConfirmation>>", self.push)
         self.root.bind("<Delete>", self.delete)
+        self.root.bind("<Control-s>", self.save)
         
         self.whiteAgent = agent.EditorOpeningAgent(self.opening)
         self.blackAgent = self.whiteAgent
@@ -29,3 +30,6 @@ class Editor(OpeningPlayer):
             self.opening.push(move)
         self.opening.pop()
         self.back(event)
+    
+    def save(self, event):
+        database.openings.save(self.opening, True)

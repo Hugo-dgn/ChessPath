@@ -17,7 +17,6 @@ class Player:
         self.lock = False
     
     def forward(self, event):
-        self.root.event_generate("<<ForwardCall>>")
         if len(self.board.board.move_stack) == 0:
             self.start(event, True)
         else:

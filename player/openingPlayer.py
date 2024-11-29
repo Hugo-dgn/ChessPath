@@ -26,7 +26,6 @@ class OpeningPlayer(Player):
         self.root.bind("<S>", self.show_moves_persistent)
         self.root.bind("<s>", self.show_moves_non_persistent)
         self.root.bind("<c>", self.clear)
-        self.root.bind("<Control-s>", self.save)
         self.root.bind("<space>", self.hint_moves)
         self.root.bind("<<MoveConfirmation>>", self.show_moves_if_persistent)
         self.root.bind("<<MoveBack>>", self.show_moves_if_persistent_back)
@@ -65,6 +64,3 @@ class OpeningPlayer(Player):
         for move in moves:
             start = move.from_square
             self.board.highlight(start)
-    
-    def save(self, event):
-        database.openings.save(self.opening, True)

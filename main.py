@@ -9,7 +9,6 @@ import database
 import opening
 
 def get_board(args):
-    args.color = args.color == "w"
     root = tk.Tk()
     board_frame = tk.Frame(root)
     chess_board = board.ChessBoard(board_frame, args.size)
@@ -22,58 +21,31 @@ def get_board(args):
 
 def board_window(args):
     chess_board, root = get_board(args)
-    root.mainloop()
-
-def player_window(args):
-    chess_board, root = get_board(args)
-    
-    if args.whiteAgent == "human":
-        if args.opening is None:
-            op = None
-        else:
-            op = database.openings.load(args.opening, chess.WHITE)
-            if op is None:
-                assert False, "Opening not found for white agent"
-        if op is None:
-            white_agent = agent.Agent()
-        else:
-            white_agent = agent.HumanOpeningAgent(op)
-    else:
-        op = database.openings.load(args.whiteAgent, chess.WHITE)
-        if op is None:
-            assert False, "Opening not found for white agent"
-        white_agent = agent.OpeningAgent(op)
-            
-    if args.blackAgent == "human":
-        if args.opening is None:
-            op = None
-        else:
-            op = database.openings.load(args.opening, chess.BLACK)
-            if op is None:
-                assert False, "Opening not found for black agent"
-        if op is None:
-            black_agent = agent.Agent()
-        else:
-            black_agent = agent.HumanOpeningAgent(op)
-    else:
-        op = database.openings.load(args.blackAgent, chess.BLACK)
-        if op is None:
-            assert False, "Opening not found for black agent"
-        black_agent = agent.OpeningAgent(op)
+    white_agent = agent.Agent()
+    black_agent = agent.Agent()
     base_player = player.Player(chess_board, white_agent, black_agent)
     root.mainloop()
 
+def player_window(args):
+    setattr(args, "fliped", args.color == "b")
+    chess_board, root = get_board(args)
+    op_player = player.OpeningPlayer(chess_board, args.opening, args.color)
+    root.mainloop()
+
 def openingPlayer_window(args):
+    setattr(args, "fliped", args.color == "b")
     chess_board, root = get_board(args)
     op_player = player.OpeningPlayer(chess_board, args.opening, args.color)
     root.mainloop()
 
 def editor_window(args):
+    setattr(args, "fliped", args.color == "b")
     chess_board, root = get_board(args)
     editor = player.Editor(chess_board, args.opening, args.color)
     root.mainloop()
 
 def train_window(args):
+    setattr(args, "fliped", args.color == "b")
     chess_board, root = get_board(args)
     train_player = player.TrainPlayer(chess_board, args.opening, args.color)
     root.mainloop()
@@ -107,11 +79,9 @@ if __name__ == "__main__":
     board_parser.set_defaults(func=board_window)
     
     player_parser = subparsers.add_parser("player", help="Chess player")
-    player_parser.add_argument("whiteAgent", type=str, help="name of the white agent")
-    player_parser.add_argument("blackAgent", type=str, help="name of the black agent")
-    player_parser.add_argument("--opening", type=str, help="name of the opening")
+    player_parser.add_argument("opening", type=str, help="name of the opening")
+    player_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
     player_parser.add_argument("--size", type=int, default=64, help="Size of a square")
-    player_parser.add_argument("--fliped", action="store_true", help="Is the board fliped")
     player_parser.set_defaults(func=player_window)
     
     openingPlayer_parser = subparsers.add_parser("openingPlayer", help="Chess player with opening")
@@ -125,14 +95,12 @@ if __name__ == "__main__":
     editor_parser.add_argument("opening", type=str, help="name of the opening")
     editor_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
     editor_parser.add_argument("--size", type=int, default=64, help="Size of a square")
-    editor_parser.add_argument("--fliped", action="store_true", help="Is the board fliped")
     editor_parser.set_defaults(func=editor_window)
     
     train_parser = subparsers.add_parser("train", help="Train an opening")
     train_parser.add_argument("opening", type=str, help="name of the opening")
     train_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
     train_parser.add_argument("--size", type=int, default=64, help="Size of a square")
-    train_parser.add_argument("--fliped", action="store_true", help="Is the board fliped")
     train_parser.set_defaults(func=train_window)
     
     
