@@ -18,9 +18,6 @@ class OpeningPlayer(Player):
         
         Player.__init__(self, board, whiteAgent, blackAgent)
         
-        if not color:
-            self.board.flip()
-        
         self.persistent_show_moves = False
         
         self.root.bind("<S>", self.show_moves_persistent)

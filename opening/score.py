@@ -1,3 +1,5 @@
+import numpy as np
+
 def depthScore(node):
     links = node.children
     next_link = max(links, key=lambda link: depth(link.end))
@@ -6,7 +8,16 @@ def depthScore(node):
 
 def successRateScore(node):
     links = node.children
-    next_link = min(links, key=lambda link: _min_success_rate(link, []))
+    scores = np.array([_min_success_rate(link, []) for link in links])
+    visits = np.array([link.visits for link in links])
+    worst_link = np.min(scores)
+    
+    candidates = scores == worst_link
+    visits[~candidates] = max(visits) + 1
+    
+    next_link_index = np.argmin(visits)
+    next_link = links[next_link_index]
+    
     next_move = next_link.move
     return next_move
 

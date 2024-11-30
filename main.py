@@ -28,31 +28,37 @@ def board_window(args):
 
 def player_window(args):
     setattr(args, "fliped", args.color == "b")
+    color = args.color == "w"
     chess_board, root = get_board(args)
-    op_player = player.OpeningPlayer(chess_board, args.opening, args.color)
+    op_player = player.OpeningPlayer(chess_board, args.opening, color)
     root.mainloop()
 
 def openingPlayer_window(args):
     setattr(args, "fliped", args.color == "b")
+    color = args.color == "w"
     chess_board, root = get_board(args)
-    op_player = player.OpeningPlayer(chess_board, args.opening, args.color)
+    op_player = player.OpeningPlayer(chess_board, args.opening, color)
     root.mainloop()
 
 def editor_window(args):
     setattr(args, "fliped", args.color == "b")
+    color = args.color == "w"
     chess_board, root = get_board(args)
-    editor = player.Editor(chess_board, args.opening, args.color)
+    editor = player.Editor(chess_board, args.opening, color)
     root.mainloop()
 
 def train_window(args):
     setattr(args, "fliped", args.color == "b")
+    color = args.color == "w"
     chess_board, root = get_board(args)
-    train_player = player.TrainPlayer(chess_board, args.opening, args.color)
+    train_player = player.TrainPlayer(chess_board, args.opening, color)
     root.mainloop()
 
 def db_command(args):
     if hasattr(args, "color"):
-        args.color = args.color == "w"
+        color = args.color == "w"
+    else:
+        color = None
     if args.tables == "op":
         if args.command == "reset":
             database.openings.reset()
@@ -63,10 +69,10 @@ def db_command(args):
             print(df.head())
         elif args.command == "commit":
             if args.action == "create":
-                op = opening.Opening(args.name, args.color, opening.Node())
+                op = opening.Opening(args.name, color, opening.Node())
                 database.openings.save(op)
             elif args.action == "delete":
-                database.openings.delete(args.name, args.color)
+                database.openings.delete(args.name, color)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Chess game")

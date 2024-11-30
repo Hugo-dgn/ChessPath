@@ -47,11 +47,11 @@ class TrainPlayer(OpeningPlayer):
                     link.successes += 1
     
     def move_on_reset(self, event):
-        if self.color == "b":
+        if not self.color:
             self.forward(event)
     
     def toggle(self, event):
-        if self.color == "w":
+        if self.color:
             if self.edit_mode:
                 self.blackAgent = agent.TrainOpeningAgent(self.opening)
             else:

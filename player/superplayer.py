@@ -31,6 +31,7 @@ class Player:
         self.root.event_generate("<<MoveBack>>")
 
     def move(self, event, forward):
+        self.root.event_generate("<<ForwardCall>>")
         if self.lock:
             self.board.back()
             return
