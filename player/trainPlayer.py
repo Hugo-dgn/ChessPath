@@ -19,9 +19,14 @@ class TrainPlayer(OpeningPlayer):
             self.blackAgent = agent.HumanTrainOpeningAgent(self.opening)
     
         self.color = color
+        self.edit_mode = False
+        self.anchor_fen = None
 
         self.root.bind("<<MoveConfirmation>>", self.update_success_rate)
         self.root.bind("<<Reset>>", self.move_on_reset)
+        self.root.bind("<t>", self.toggle)
+        self.root.bind("<a>", self.anchor)
+        self.root.bind("<A>", self.go_to_anchor)
     
     def update_success_rate(self, event):
         if len(self.board.board.move_stack) == 0:
@@ -44,5 +49,25 @@ class TrainPlayer(OpeningPlayer):
     def move_on_reset(self, event):
         if self.color == "b":
             self.forward(event)
+    
+    def toggle(self, event):
+        if self.color == "w":
+            if self.edit_mode:
+                self.blackAgent = agent.TrainOpeningAgent(self.opening)
+            else:
+                self.blackAgent = agent.HumanTrainOpeningAgent(self.opening)
+        else:
+            if self.edit_mode:
+                self.whiteAgent = agent.TrainOpeningAgent(self.opening)
+            else:
+                self.whiteAgent = agent.HumanTrainOpeningAgent(self.opening)
+
+        self.edit_mode = not self.edit_mode
+    
+    def anchor(self, event):
+        self.anchor_fen = self.board.board.fen()
         
-        
+    def go_to_anchor(self, event):
+        if self.anchor_fen is None:
+            return
+        self.board.reset(self.anchor_fen)

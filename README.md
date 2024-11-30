@@ -1,77 +1,113 @@
 # ChessPath - Chess Opening Trainer
 
-This application helps users learn chess openings effectively.
+ChessPath is a tool designed to help users learn and master chess openings effectively.
+
+---
 
 ## Manage Opening Database
 
-To create or reset the opening database:
+### Reset or Initialize the Database
+
+To reset or initialize the opening database:
 
 ```bash
 python main.py db op reset
 ```
 
-You can then create an opening:
+### Create an Opening
+
+To create a new opening:
 
 ```bash
-python main.py db op commit create name color
+python main.py db op commit create <name> <color>
 ```
 
-Where `name` is the name of the opening, and `color` is either `w` for white or `b` for black.
+- **`<name>`**: The name of the opening.  
+- **`<color>`**: The color you play the opening with (`w` for white, `b` for black).
 
-To delete an opening:
+### Delete an Opening
+
+To delete an existing opening:
 
 ```bash
-python main.py db op delete name color
+python main.py db op commit delete <name> <color>
 ```
+
+---
 
 ## Chess Game
 
-To display a standard chessboard:
+### Display a Standard Chessboard
+
+To display a chessboard:
 
 ```bash
 python main.py board
 ```
 
+---
+
 ## Edit Openings
 
-You can edit an opening with:
+### Modify an Existing Opening
+
+To edit an opening:
 
 ```bash
-python main.py editor openingName color
+python main.py editor <openingName> <color>
 ```
 
-Where `openingName` is the name of the opening, and `color` is the color you play this opening with.
+- **`<openingName>`**: The name of the opening to edit.  
+- **`<color>`**: The color you play this opening with (`w` or `b`).
+
+---
 
 ## Explore Openings
 
-To explore openings:
+### View Opening Moves
+
+To explore a specific opening:
 
 ```bash
-python main.py player openingName color
+python main.py player <openingName> <color>
 ```
 
+---
+
 ## Train Openings
+
+### Practice Opening Moves
 
 To train an opening:
 
 ```bash
-python main.py train openingName color
+python main.py train <openingName> <color>
 ```
 
-If you are playing as black (`color=b`), press `<r>` (for reset) to start the line.
+For black openings (`<color>=b`), press `<r>` to reset and start the line.
+
+---
 
 ## Keyboard Commands
 
-Here are some commands to help you navigate openings:
+### General Commands
 
-- `<r>` : Reset the board  
-- `<s>` : Show the moves of the opening once  
-- `<S>` : Always show the moves of the opening  
-- `<c>` : Clear all drawings on the board  
-- `<Left>` : Take back the last move  
-- `<Forward>` : Automatically play the next move  
-- `<Space>` : Provide a hint for the next opening move  
+- **`<r>`**: Reset the board.  
+- **`<s>`**: Show the moves of the opening once.  
+- **`<S>`**: Always show the moves of the opening.  
+- **`<c>`**: Clear all drawings on the board.  
+- **`<Left>`**: Undo the last move.  
+- **`<Forward>`**: Play the next move automatically.  
+- **`<Space>`**: Show a hint for the next move.
 
-### Editor Mode Only:
-- `<Control-s>` : Save the opening in the editor  
-- `<Delete>` : Delete the last move in the editor  
+### Editor Mode Commands
+
+- **`<t>`**: Toggle between training and exploring the opening.  
+- **`<a>`**: Set an anchor at the current position.  
+- **`<A>`**: Jump to the anchor.  
+- **`<Ctrl+s>`**: Save the current state of the opening.  
+- **`<Delete>`**: Delete the last move in the editor.
+
+--- 
+
+ChessPath makes it easy to practice and perfect your favorite chess openings.
