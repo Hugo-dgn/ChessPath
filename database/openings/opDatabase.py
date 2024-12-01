@@ -4,15 +4,15 @@ import pandas as pd
 import opening
 import database.utils as utils
 
-OPENING_FILE = 'database/openings.db'
+DATABASE_FILE = 'database.db'
 
 def list_tables():
-    conn = utils.create_connection(OPENING_FILE)
+    conn = utils.create_connection(DATABASE_FILE)
     rows = utils.list_table(conn)
     return rows
 
 def reset():
-    conn = utils.create_connection(OPENING_FILE)
+    conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
     cur.execute("DROP TABLE IF EXISTS openings")
     cur.execute("CREATE TABLE openings ( color BOOL, name STRING, tree BLOB, PRIMARY KEY (color, name));")
@@ -23,13 +23,13 @@ def table(name):
     tables = list_tables()
     if (name,) not in tables:
         assert False, f"Table {name} not found"
-    conn = utils.create_connection(OPENING_FILE)
+    conn = utils.create_connection(DATABASE_FILE)
     query = f"SELECT * FROM {name}"
     df = pd.read_sql_query(query, conn)
     return df
 
 def openings():
-    conn = utils.create_connection(OPENING_FILE)
+    conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
     cur.execute("SELECT name FROM openings")
     names = cur.fetchall()
@@ -45,7 +45,7 @@ def save(opening, overwrite=False):
     color = opening.color
     tree = opening.tree
     
-    conn = utils.create_connection(OPENING_FILE)
+    conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
     serialized_tree = pickle.dumps(tree)
     if overwrite:
@@ -62,14 +62,14 @@ def save(opening, overwrite=False):
     conn.commit()
 
 def delete(name, color):
-    conn = utils.create_connection(OPENING_FILE)
+    conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
     cur.execute("DELETE FROM openings WHERE name = ? AND color = ?", (name, color))
     conn.commit()
 
 
 def load(name, color):
-    conn = utils.create_connection(OPENING_FILE)
+    conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
     cur.execute("SELECT tree FROM openings WHERE name = ? AND color = ?", (name, color))
     tree = cur.fetchone()

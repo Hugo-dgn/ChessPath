@@ -95,18 +95,23 @@ For black openings (`<color>=b`), press `<r>` to reset and start the line.
 - **`<r>`**: Reset the board.  
 - **`<s>`**: Show the moves of the opening once.  
 - **`<S>`**: Always show the moves of the opening.  
-- **`<c>`**: Clear all drawings on the board.  
-- **`<Left>`**: Undo the last move.  
+- **`<c>`**: Clear all drawings on the board.
+- **`<W>`** : Shows all writen anotation for the current position
+- **`<Left>`**: Undo the last move.
 - **`<Forward>`**: Play the next move automatically.  
 - **`<Space>`**: Show a hint for the next move.
 
 ### Editor Mode Commands
 
-- **`<t>`**: Toggle between training and exploring the opening.  
-- **`<a>`**: Set an anchor at the current position.  
-- **`<A>`**: Jump to the anchor.  
+- **`<w>`** : Write all drawing into the position annotation
 - **`<Ctrl+s>`**: Save the current state of the opening.  
 - **`<Delete>`**: Delete the last move in the editor.
+
+### Trainer Mode Commands
+
+- **`<t>`**: Toggle between training and exploring the opening.  
+- **`<a>`**: Set an anchor at the current position.  
+- **`<A>`**: Jump to the anchor. 
 
 --- 
 

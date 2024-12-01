@@ -7,6 +7,8 @@ class Node:
     def __init__(self) -> None:
         self.parents = []
         self.children = []
+        self.arrows_annotations = []
+        self.highlight_annotations = []
     
     def _add_child(self, move : chess.Move, leaf : 'Node') -> None:
         link = Link(move, self, leaf)

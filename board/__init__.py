@@ -11,7 +11,7 @@ COLOR_WHITE_SQUARE = "#B3B6B7"
 COLOR_BLACK_SQUARE = "#A04000"
 
 square_to_radius_ratio = 4
-square_to_arrow_width_ratio = 4
+square_to_arrow_width_ratio = 6
 hold_size_ratio = 1.5
 
 class ChessBoard:
@@ -37,6 +37,9 @@ class ChessBoard:
         self._persistent_arrow_line = []
         self._circle = []
         self._highlight = []
+        
+        self.arrow_coords = []
+        self.highlight_coords = []
         
         self._button3 = None
         
@@ -118,16 +121,25 @@ class ChessBoard:
         
         self.order_layer()
     
-    def highlight(self, square):
+    def highlight(self, square, fill=None):
+        if fill is None:
+            fill = "red"
+        self.highlight_coords.append(square)
         x, y = _get_square_pos(square, self.square_size, self.is_flipped, center=True)
         r = self.square_size//2
         x -= r
         y -= r
-        square = self.canvas.create_rectangle(x, y, x+2*r, y+2*r, fill="red", stipple="gray50", tags="highlight")
+        square = self.canvas.create_rectangle(x, y, x+2*r, y+2*r, fill=fill, stipple="gray50", tags="highlight")
         self._highlight.append(square)
         self.order_layer()
     
-    def arrow(self, start, end, persistent=False):
+    def arrow(self, start, end, persistent=False, fill=None):
+        if fill is None:
+            if not persistent:
+                fill = "orange"
+            else:
+                fill = "blue"
+        self.arrow_coords.append((start, end))
         start_loc = _get_square_pos(start, self.square_size, self.is_flipped, center=True)
         end_loc = _get_square_pos(end, self.square_size, self.is_flipped, center=True)
         
@@ -163,29 +175,34 @@ class ChessBoard:
         points.append(end_loc)
         
         arrow_width = self.square_size//square_to_arrow_width_ratio
-        arrow_shape = (arrow_width, arrow_width * 2, arrow_width // 2)
-        line = self.canvas.create_line(*points, arrow=tk.LAST, width=arrow_width, arrowshape=arrow_shape, fill="orange", stipple="gray75", tags="arrow")
+        arrow_shape = (arrow_width, arrow_width, arrow_width)
+        line = self.canvas.create_line(*points, arrow=tk.LAST, width=arrow_width, arrowshape=arrow_shape, fill=fill, stipple="gray75", tags="arrow")
         
         if not persistent:
             self._arrow_line.append(line)
         else:
             self._persistent_arrow_line.append(line)
 
-    def clear(self):
+    def clear(self, clear_persistent=True):
         if self.locked:
             return
         for line in self._arrow_line:
             self.canvas.delete(line)
-        for line in self._persistent_arrow_line:
-            self.canvas.delete(line)
+        
+        if clear_persistent:
+            for line in self._persistent_arrow_line:
+                self.canvas.delete(line)
         for circle in self._circle:
             self.canvas.delete(circle)
         for square in self._highlight:
             self.canvas.delete(square)
         self._arrow_line = []
-        self._persistent_arrow_line = []
+        if clear_persistent:
+            self._persistent_arrow_line = []
         self._circle = []
         self._highlight = []
+        self.arrow_coords = []
+        self.highlight_coords = []
         
     def _clear(self, event):
         self.clear()
@@ -212,16 +229,7 @@ class ChessBoard:
         if flag:
             return
         
-        for line in self._arrow_line:
-            self.canvas.delete(line)
-        for circle in self._circle:
-            self.canvas.delete(circle)
-        for square in self._highlight:
-            self.canvas.delete(square)
-        self._arrow_line = []
-        self._circle = []
-        self._highlight = []
-
+        self.clear(clear_persistent=False)
         
         square = _get_square_from_click(event.x, event.y, self.square_size, self.is_flipped)
         piece = self.board.piece_at(square)
@@ -354,9 +362,9 @@ def _draw_board(root, case_size):
     for i in range(8):
         for j in range(8):
             if (i+j) % 2:
-                color = COLOR_WHITE_SQUARE
-            else:
                 color = COLOR_BLACK_SQUARE
+            else:
+                color = COLOR_WHITE_SQUARE
             canvas.create_rectangle(i*case_size, j*case_size,
                                 (i+1)*case_size, (j+1)*case_size,
                                 fill=color, outline="")
