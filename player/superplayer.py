@@ -7,12 +7,20 @@ class Player:
         self.whiteAgent = whiteAgent
         self.blackAgent = blackAgent
         
+        self._whiteAgent = whiteAgent
+        self._blackAgent = blackAgent
+        
+        self.is_toggle = False
+        
         self.root = board.root
         self.root.focus_set()
         self.root.bind("<<MoveConfirmation>>", lambda event : self.move(event, False))
         self.root.bind("<Left>", self.back)
         self.root.bind("<Right>", self.forward)
         self.root.bind("<r>", self.reset)
+        self.root.bind("<a>", self.anchor)
+        self.root.bind("<A>", self.go_to_anchor)
+        self.root.bind("<t>", self.toggle)
         
         self.lock = False
     
@@ -75,3 +83,20 @@ class Player:
         self.board.reset()
         self.root.event_generate("<<Reset>>")
         self.lock = False
+    
+    def anchor(self, event):
+        self.anchor_fen = self.board.board.fen()
+        
+    def go_to_anchor(self, event):
+        if self.anchor_fen is None:
+            return
+        self.board.reset(self.anchor_fen)
+    
+    def toggle(self, event):
+        if not self.is_toggle:
+            self.whiteAgent = agent.Agent()
+            self.blackAgent = agent.Agent()
+        else:
+            self.whiteAgent = self._whiteAgent
+            self.blackAgent = self._blackAgent
+        self.is_toggle = not self.is_toggle

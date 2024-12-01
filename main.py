@@ -54,6 +54,19 @@ def train_window(args):
     train_player = player.TrainPlayer(chess_board, args.opening, color)
     root.mainloop()
 
+def lichess_sim_window(args):
+    setattr(args, "fliped", args.color == "b")
+    color = args.color == "w"
+    if color:
+        white_agent = agent.Agent()
+        black_agent = agent.LichessOpeningAgent(args.rating_range, args.time_control, args.number_of_moves)
+    else:
+        white_agent = agent.LichessOpeningAgent(args.rating_range, args.time_control, args.number_of_moves)
+        black_agent = agent.Agent()
+    chess_board, root = get_board(args)
+    base_player = player.Player(chess_board, white_agent, black_agent)
+    root.mainloop()
+
 def db_command(args):
     if hasattr(args, "color"):
         color = args.color == "w"
@@ -102,6 +115,14 @@ if __name__ == "__main__":
     editor_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
     editor_parser.add_argument("--size", type=int, default=64, help="Size of a square")
     editor_parser.set_defaults(func=editor_window)
+    
+    lichess_sim_parser = subparsers.add_parser("lichess-sim", help="Simulate a lichess game")
+    lichess_sim_parser.add_argument("color", type=str, choices=["w", "b"], help="Color of the player")
+    lichess_sim_parser.add_argument("rating_range", type=int, nargs=2, help="Rating range")
+    lichess_sim_parser.add_argument("time_control", type=str, choices=["bullet", "blitz", "rapid", "classical"], help="Time control")
+    lichess_sim_parser.add_argument("number_of_moves", type=int, help="Number of moves")
+    lichess_sim_parser.add_argument("--size", type=int, default=64, help="Size of a square")
+    lichess_sim_parser.set_defaults(func=lichess_sim_window)
     
     train_parser = subparsers.add_parser("train", help="Train an opening")
     train_parser.add_argument("opening", type=str, help="name of the opening")
