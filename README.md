@@ -1,6 +1,6 @@
 # ChessPath - Chess Opening Trainer
 
-ChessPath is a tool designed to help users learn and master chess openings effectively.
+ChessPath is a tool designed to help users learn and master chess openings.
 
 ---
 
@@ -97,6 +97,9 @@ For black openings (`<color>=b`), press `<r>` to reset and start the line.
 - **`<S>`**: Always show the moves of the opening.  
 - **`<c>`**: Clear all drawings on the board.
 - **`<W>`** : Shows all writen anotation for the current position
+- **`<t>`**: Toggle between current mode and two players mode
+- **`<a>`**: Set an anchor at the current position.  
+- **`<A>`**: Jump to the anchor. 
 - **`<Left>`**: Undo the last move.
 - **`<Forward>`**: Play the next move automatically.  
 - **`<Space>`**: Show a hint for the next move.
@@ -106,13 +109,3 @@ For black openings (`<color>=b`), press `<r>` to reset and start the line.
 - **`<w>`** : Write all drawing into the position annotation
 - **`<Ctrl+s>`**: Save the current state of the opening.  
 - **`<Delete>`**: Delete the last move in the editor.
-
-### Trainer Mode Commands
-
-- **`<t>`**: Toggle between training and exploring the opening.  
-- **`<a>`**: Set an anchor at the current position.  
-- **`<A>`**: Jump to the anchor. 
-
---- 
-
-ChessPath makes it easy to practice and perfect your favorite chess openings.
