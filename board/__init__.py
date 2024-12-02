@@ -120,7 +120,7 @@ class ChessBoard:
                 square += 1
         
         self.order_layer()
-        self.root.update()
+        self.canvas.update()
     
     def highlight(self, square, fill=None):
         if fill is None:
@@ -274,7 +274,6 @@ class ChessBoard:
             image_id, _ = self._square_images[self.selected_square]
             ofset = hold_size_ratio*self.square_size//2
             self.canvas.moveto(image_id, event.x - ofset, event.y - ofset)
-            self.canvas.update()
     
     def _promotion_panel(self, move):
         if self.board.turn:
