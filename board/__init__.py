@@ -120,7 +120,7 @@ class ChessBoard:
                 square += 1
         
         self.order_layer()
-        self.canvas.update()
+        self.canvas.update_idletasks()
     
     def highlight(self, square, fill=None):
         if fill is None:
