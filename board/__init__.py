@@ -120,6 +120,7 @@ class ChessBoard:
                 square += 1
         
         self.order_layer()
+        self.root.update()
     
     def highlight(self, square, fill=None):
         if fill is None:
@@ -336,9 +337,9 @@ class ChessBoard:
                 self.board.push(move)
                 flag = True
         
+        self.draw()
         if flag:
             self.root.event_generate("<<MoveConfirmation>>")
-        self.draw()
         return flag
 
     def back(self):
