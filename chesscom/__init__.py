@@ -1,0 +1,1 @@
+from .query import fetch_chesscom_games

@@ -31,9 +31,9 @@ def table(name):
 def openings():
     conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
-    cur.execute("SELECT name FROM openings")
-    names = cur.fetchall()
-    return names
+    cur.execute("SELECT name, color FROM openings")
+    op = cur.fetchall()
+    return op
     
 
 def save(opening, overwrite=False):

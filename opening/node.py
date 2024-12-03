@@ -9,6 +9,7 @@ class Node:
         self.children = []
         self.arrows_annotations = []
         self.highlight_annotations = []
+        self._position = None
     
     def _add_child(self, move : chess.Move, leaf : 'Node') -> None:
         link = Link(move, self, leaf)
@@ -74,6 +75,10 @@ class Node:
         return [link.move for link in self.children]
     
     def get_position(self) -> str:
+        if not hasattr(self, "_position"):
+            self._position = None
+        if self._position is not None:
+            return self._position
         board = chess.Board()
         moves = []
         
@@ -86,7 +91,8 @@ class Node:
         for move in moves:
             board.push(move)
         
-        return utils.get_position(board)
+        self._position = utils.get_position(board)
+        return self._position
 
     def root(self) -> 'Node':
         node = self
@@ -116,7 +122,11 @@ class Link:
 
 def _find_twin(root : Node, node : Node) -> Node:
     position = node.get_position()
+    visited = []
     def aux(root, board):
+        if root in visited:
+            return None
+        visited.append(root)
         if root is not node and root.get_position() == position:
             return root
         for link in root.children:
@@ -126,6 +136,6 @@ def _find_twin(root : Node, node : Node) -> Node:
             if result:
                 return result
         return None
-    
-    return aux(root, chess.Board())
+    result = aux(root, chess.Board())
+    return result
         
