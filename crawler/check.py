@@ -56,7 +56,8 @@ def fromPGN(pgns, player_name, max_deviation):
     return white_mistakes, black_mistakes
 
 def add_mistake(op, pgn, move, color, white_mistakes, black_mistakes):
+    data = {'name' : op.name, 'node' : copy.deepcopy(op.cursor), 'pgn' : pgn, 'move' : move}
     if color:
-        white_mistakes.append((op.name, move, pgn))
+        white_mistakes.append(data)
     else:
-        black_mistakes.append((op.name, move, pgn))
+        black_mistakes.append(data)
