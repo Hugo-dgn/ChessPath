@@ -88,12 +88,39 @@ python main.py train <openingName> <color>
 
 ---
 
-## Train Against Lichess Openings Database
+## Replay Opening Mistakes
 
-You can train against the most common moves played on Lichess for a given ELO, position, and time control:
+You can replay opening mistakes made on chess.com with:
 
 ```bash
-python main.py lichess-sim <color> <min_elo> <max_elo> <time_control> <number_of_move>
+python main.py mistakes <user-name> <from-date> <time-control>
+```
+
+Where:
+- **`<user-name>`**: Your chess.com username.  
+- **`<from-date>`**: A date in the format `yyyy-mm-dd` from which you want to analyze your games.  
+- **`<time-control>`**: The time control in seconds or in the format `seconds+increment`.
+
+For example:
+
+```bash
+python main.py mistakes Bob 2024-08-01 600
+```
+
+This would fetch rapid games played from 2024-08-01 by Bob in 10-minute time control. To go to the next mistake, press `<M>`. To reset the board to the current mistake, press `<m>`. If you want the app to automatically switch to the next mistake once the correct move is input, run:
+
+```bash
+python main.py mistakes <user-name> <from-date> <time-control> --auto-next
+```
+
+---
+
+## Train Against Lichess Openings Database
+
+You can train against the most common moves played on Lichess for a given ELO range, position, and time control:
+
+```bash
+python main.py lichess-sim <color> <min_elo> <max_elo> <time_control> <number_of_moves>
 ```
 
 Where:
@@ -101,9 +128,14 @@ Where:
 - **`<min_elo>`**: Minimum ELO of the players in the database.  
 - **`<max_elo>`**: Maximum ELO of the players in the database.  
 - **`<time_control>`**: Time control to filter by (`bullet`, `blitz`, `rapid`, `classical`).  
-- **`<number_of_move>`**: Number of the most common moves to consider.
+- **`<number_of_moves>`**: Number of the most common moves to consider.
 
-A good way to use this feature is to first press `<t>` to toggle to two-player mode. Input a position of interest, then press`<t>` to toggle back and `<a>` to set an anchor to that position. Continue playing, and to return to the anchor, press `<A>`.
+To use this feature effectively:
+1. Press `<t>` to toggle two-player mode.
+2. Input a position of interest.
+3. Press `<t>` again to toggle back.
+4. Press `<a>` to set an anchor to that position.
+5. Continue playing, and press `<A>` to return to the anchor.
 
 ---
 
@@ -128,3 +160,8 @@ A good way to use this feature is to first press `<t>` to toggle to two-player m
 - **`<w>`**: Write all drawings into the position annotation.  
 - **`<Ctrl+s>`**: Save the current state of the opening.  
 - **`<Delete>`**: Delete the last move in the editor.
+
+### Mistake Mode Commands
+
+- **`<M>`**: Go to the next mistake.  
+- **`<m>`**: Reset the board to the current mistake.
