@@ -1,6 +1,6 @@
 # ChessPath - Chess Opening Trainer
 
-**ChessPath** allows users to manage opening databases, explore and train openings, replay mistakes from your `Chess.com` games, and simulate common moves from the `Lichess` database based on ELO and time controls.
+**ChessPath** allows users to manage opening databases, explore and train openings, replay mistakes from their `Chess.com` games, and simulate common moves from the `Lichess` database based on ELO and time controls.
 
 ---
 
