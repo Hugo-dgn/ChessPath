@@ -43,12 +43,15 @@ class Player:
         if self.lock:
             self.board.back()
             return
+        
         self.lock = True
         _board  = self.board.board.copy()
-        last_move = _board.pop()
-        flag1 = self.move_confirmation(_board, last_move)
-        if not flag1:
-            self.board.back()
+        flag1 = False
+        while not flag1 and len(_board.move_stack) > 0:
+            last_move = _board.pop()
+            flag1 = self.move_confirmation(_board, last_move)
+            if not flag1:
+                self.board.back()
         
         move = self.agent_action(forward)
         self.lock = False

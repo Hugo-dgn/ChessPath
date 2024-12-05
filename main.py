@@ -1,12 +1,19 @@
 import tkinter as tk
 import argparse
-import chess
 
 import board
 import player
 import agent
 import database
 import opening
+import chesscom
+import crawler
+
+#### default values
+
+size = 64
+
+#### functions
 
 def get_board(args):
     root = tk.Tk()
@@ -53,6 +60,17 @@ def train_window(args):
     chess_board, root = get_board(args)
     train_player = player.TrainPlayer(chess_board, args.opening, color)
     root.mainloop()
+    
+def mistakes_window(args):
+    setattr(args, "fliped", False)
+    chess_board, root = get_board(args)
+    pgns = chesscom.fetch_chesscom_games(args.user_name, args.date, args.time)
+    white_mistakes, black_mistakes = crawler.fromPGN(pgns, 'hugo_dgn', 0)
+    print(f"Mistakes found for white : {len(white_mistakes)}")
+    print(f"Mistakes found for black : {len(black_mistakes)}")
+    print("")
+    base_player = player.MistakePlayer(white_mistakes, black_mistakes, chess_board, args.auto_next)
+    root.mainloop()
 
 def lichess_sim_window(args):
     setattr(args, "fliped", args.color == "b")
@@ -93,27 +111,20 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(dest="command")
     
     board_parser = subparsers.add_parser("board", help="Chess board")
-    board_parser.add_argument("--size", type=int, default=64, help="Size of a square")
+    board_parser.add_argument("--size", type=int, default=size, help="Size of a square")
     board_parser.add_argument("--fliped", action="store_true", help="Is the board fliped")
     board_parser.set_defaults(func=board_window)
     
     player_parser = subparsers.add_parser("player", help="Chess player")
     player_parser.add_argument("opening", type=str, help="name of the opening")
     player_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
-    player_parser.add_argument("--size", type=int, default=64, help="Size of a square")
+    player_parser.add_argument("--size", type=int, default=size, help="Size of a square")
     player_parser.set_defaults(func=player_window)
-    
-    openingPlayer_parser = subparsers.add_parser("openingPlayer", help="Chess player with opening")
-    openingPlayer_parser.add_argument("opening", type=str, help="name of the opening")
-    openingPlayer_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
-    openingPlayer_parser.add_argument("--size", type=int, default=64, help="Size of a square")
-    openingPlayer_parser.add_argument("--fliped", action="store_true", help="Is the board fliped")
-    openingPlayer_parser.set_defaults(func=openingPlayer_window)
     
     editor_parser = subparsers.add_parser("editor", help="Opening editor")
     editor_parser.add_argument("opening", type=str, help="name of the opening")
     editor_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
-    editor_parser.add_argument("--size", type=int, default=64, help="Size of a square")
+    editor_parser.add_argument("--size", type=int, default=size, help="Size of a square")
     editor_parser.set_defaults(func=editor_window)
     
     lichess_sim_parser = subparsers.add_parser("lichess-sim", help="Simulate a lichess game")
@@ -121,14 +132,22 @@ if __name__ == "__main__":
     lichess_sim_parser.add_argument("rating_range", type=int, nargs=2, help="Rating range")
     lichess_sim_parser.add_argument("time_control", type=str, choices=["bullet", "blitz", "rapid", "classical"], help="Time control")
     lichess_sim_parser.add_argument("number_of_moves", type=int, help="Number of moves")
-    lichess_sim_parser.add_argument("--size", type=int, default=64, help="Size of a square")
+    lichess_sim_parser.add_argument("--size", type=int, default=size, help="Size of a square")
     lichess_sim_parser.set_defaults(func=lichess_sim_window)
     
     train_parser = subparsers.add_parser("train", help="Train an opening")
     train_parser.add_argument("opening", type=str, help="name of the opening")
     train_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
-    train_parser.add_argument("--size", type=int, default=64, help="Size of a square")
+    train_parser.add_argument("--size", type=int, default=size, help="Size of a square")
     train_parser.set_defaults(func=train_window)
+    
+    mistakes_parser = subparsers.add_parser("mistakes", help="Find mistakes in a PGN")
+    mistakes_parser.add_argument("user_name", type=str, help="Chess.com user name")
+    mistakes_parser.add_argument("date", type=str, help="Date")
+    mistakes_parser.add_argument("time", type=str, help="Time control")
+    mistakes_parser.add_argument("--auto-next", action="store_true", help="Auto next mistake")
+    mistakes_parser.add_argument("--size", type=int, default=size, help="Size of a square")
+    mistakes_parser.set_defaults(func=mistakes_window)
     
     
     db_parser = subparsers.add_parser("db", help="Database")

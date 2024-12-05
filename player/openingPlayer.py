@@ -5,12 +5,13 @@ import opening as op
 
 from .superplayer import Player
 
-import time
-
 class OpeningPlayer(Player):
     
-    def __init__(self, board: board.ChessBoard, openingName : str, color : bool):
-        self.opening = database.openings.load(openingName, color)
+    def __init__(self, board: board.ChessBoard, openingName : str, color : bool, load = True):
+        if load:
+            self.opening = database.openings.load(openingName, color)
+        else:
+            self.opening = op.Opening(openingName, color, op.Node())
         if self.opening is None:
             print("Opening not found, creating new opening")
             self.opening = op.Opening(openingName, color, op.Node())
@@ -30,6 +31,11 @@ class OpeningPlayer(Player):
         self.root.bind("<space>", self.hint_moves)
         self.root.bind("<<MoveConfirmation>>", self.forward_draw)
         self.root.bind("<<MoveBack>>", self.backward_draw)
+    
+    def load(self, openingName, color):
+        self.opening = database.openings.load(openingName, color)
+        self.whiteAgent.opening = self.opening
+        self.blackAgent.opening = self.opening
 
     def show_moves(self, persistent, fill=None):
         moves = self.whiteAgent.possible_actions(self.board.board)
@@ -46,12 +52,14 @@ class OpeningPlayer(Player):
         self.show_moves(self.persistent_show_moves)
         
     def forward_draw(self, event):
+        flag1, flag2 = self.move(event, False)
         self.board.clear()
         if self.show_annotation:
             self.display_annotation(event)
         self.move(event, False)
         if self.persistent_show_moves:
             self.show_moves(True)
+        return flag1, flag2
         
     
     def backward_draw(self, event):
