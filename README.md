@@ -1,6 +1,6 @@
 # ChessPath - Chess Opening Trainer
 
-ChessPath is a tool designed to help users learn and master chess openings.
+**ChessPath** allows users to manage opening databases, explore and train openings, replay mistakes from games, and simulate common moves from the Lichess database based on ELO and time controls.
 
 ---
 
