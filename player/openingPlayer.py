@@ -1,20 +1,15 @@
+import chess.svg
+
 import board
 import agent
-import database
 import opening as op
 
 from .superplayer import Player
 
 class OpeningPlayer(Player):
     
-    def __init__(self, board: board.ChessBoard, openingName : str, color : bool, load = True):
-        if load:
-            self.opening = database.openings.load(openingName, color)
-        else:
-            self.opening = op.Opening(openingName, color, op.Node())
-        if self.opening is None:
-            print("Opening not found, creating new opening")
-            self.opening = op.Opening(openingName, color, op.Node())
+    def __init__(self, board: board.ChessBoard, opening : op.Opening):
+        self.opening = opening
         
         whiteAgent = agent.HumanOpeningAgent(self.opening)
         blackAgent = whiteAgent
@@ -29,37 +24,30 @@ class OpeningPlayer(Player):
         self.root.bind("<c>", self.clear)
         self.root.bind("<W>", self._display_annotation)
         self.root.bind("<space>", self.hint_moves)
-        self.root.bind("<<MoveConfirmation>>", self.forward_draw)
+        self.root.bind("<<MoveProcessedBySuperPlayer>>", self.forward_draw, add=True)
         self.root.bind("<<MoveBack>>", self.backward_draw)
-    
-    def load(self, openingName, color):
-        self.opening = database.openings.load(openingName, color)
-        self.whiteAgent.opening = self.opening
-        self.blackAgent.opening = self.opening
 
-    def show_moves(self, persistent, fill=None):
+    def show_moves(self, persistent):
         moves = self.whiteAgent.possible_actions(self.board.board)
         for move in moves:
             start = move.from_square
             end = move.to_square
-            self.board.arrow(start, end, persistent, fill)
+            arrow = chess.svg.Arrow(end, start, color="blue")
+            self.board.arrow(arrow, persistent=persistent)
     
     def show_moves_non_persistent(self, event):
-        self.show_moves(persistent=False, fill="blue")
+        self.show_moves(persistent=False)
     
     def show_moves_persistent(self, event):
         self.persistent_show_moves = not self.persistent_show_moves
         self.show_moves(self.persistent_show_moves)
         
     def forward_draw(self, event):
-        flag1, flag2 = self.move(event, False)
         self.board.clear()
         if self.show_annotation:
             self.display_annotation(event)
-        self.move(event, False)
         if self.persistent_show_moves:
             self.show_moves(True)
-        return flag1, flag2
         
     
     def backward_draw(self, event):
@@ -88,12 +76,7 @@ class OpeningPlayer(Player):
         moves = self.board.board.move_stack
         cursor = self.opening.line(moves)
         
-        arrow_coords = cursor.arrows_annotations
-        highlight_coords = cursor.highlight_annotations
+        arrows = cursor.arrows_annotations
         
-        
-        for arrow_coord in arrow_coords:
-            self.board.arrow(arrow_coord[0], arrow_coord[1], persistent=False, fill="green")
-        
-        for highlight_coord in highlight_coords:
-            self.board.highlight(highlight_coord, fill="green")
+        for arrow in arrows:
+            self.board.arrow(arrow)

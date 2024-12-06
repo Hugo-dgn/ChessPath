@@ -8,7 +8,6 @@ class Node:
         self.parents = []
         self.children = []
         self.arrows_annotations = []
-        self.highlight_annotations = []
         self._position = None
     
     def _add_child(self, move : chess.Move, leaf : 'Node') -> None:
@@ -54,11 +53,13 @@ class Node:
         children = []
         for link in self.children:
             children.append(link.end)
+        return children
     
     def get_parents(self) -> list:
         parents = []
         for link in self.parents:
             parents.append(link.up)
+        return parents
     
     def push(self, move : chess.Move) -> 'Node':
         for link in self.children:

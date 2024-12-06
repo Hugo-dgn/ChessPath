@@ -37,28 +37,24 @@ def player_window(args):
     setattr(args, "fliped", args.color == "b")
     color = args.color == "w"
     chess_board, root = get_board(args)
-    op_player = player.OpeningPlayer(chess_board, args.opening, color)
-    root.mainloop()
-
-def openingPlayer_window(args):
-    setattr(args, "fliped", args.color == "b")
-    color = args.color == "w"
-    chess_board, root = get_board(args)
-    op_player = player.OpeningPlayer(chess_board, args.opening, color)
+    op = database.openings.load(args.opening, color)
+    op_player = player.OpeningPlayer(chess_board, op)
     root.mainloop()
 
 def editor_window(args):
     setattr(args, "fliped", args.color == "b")
     color = args.color == "w"
     chess_board, root = get_board(args)
-    editor = player.Editor(chess_board, args.opening, color)
+    op = database.openings.load(args.opening, color)
+    editor = player.Editor(chess_board, op)
     root.mainloop()
 
 def train_window(args):
     setattr(args, "fliped", args.color == "b")
     color = args.color == "w"
     chess_board, root = get_board(args)
-    train_player = player.TrainPlayer(chess_board, args.opening, color)
+    op = database.openings.load(args.opening, color)
+    train_player = player.TrainPlayer(chess_board, op, color)
     root.mainloop()
     
 def mistakes_window(args):
@@ -95,7 +91,7 @@ def db_command(args):
             database.openings.reset()
         elif args.command == "table":
             df = database.openings.table("openings")
-            df = df.drop(columns=['tree'])
+            df = df.drop(columns=['pgn'])
             df['color'] = df['color'].replace({1: 'white', 0: 'black'})
             print(df.head())
         elif args.command == "commit":

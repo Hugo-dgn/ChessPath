@@ -15,7 +15,7 @@ def reset():
     conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
     cur.execute("DROP TABLE IF EXISTS openings")
-    cur.execute("CREATE TABLE openings ( color BOOL, name STRING, tree BLOB, PRIMARY KEY (color, name));")
+    cur.execute("CREATE TABLE openings ( color BOOL, name STRING, pgn STRING, PRIMARY KEY (color, name));")
     conn.commit()
     conn.close()
 
@@ -43,21 +43,20 @@ def save(opening, overwrite=False):
         
     name = opening.name
     color = opening.color
-    tree = opening.tree
+    pgn = opening.get_pgn()
     
     conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
-    serialized_tree = pickle.dumps(tree)
     if overwrite:
-        cur.execute("UPDATE openings SET tree = ? WHERE color = ? AND name = ?", (serialized_tree, color, name))
+        cur.execute("UPDATE openings SET pgn = ? WHERE color = ? AND name = ?", (pgn, color, name))
         if cur.rowcount == 0:
-            cur.execute("INSERT INTO openings (name, color, tree) VALUES (?, ?, ?)", (name, color, serialized_tree))
+            cur.execute("INSERT INTO openings (name, color, pgn) VALUES (?, ?, ?)", (name, color, pgn))
     else:
         cur.execute("SELECT * FROM openings WHERE name = ? AND color = ?", (name, color))
         if cur.fetchone() is not None:
             print("Opening already exists")
             return
-        cur.execute("INSERT INTO openings (name, color, tree) VALUES (?, ?, ?)", (name, color, serialized_tree))
+        cur.execute("INSERT INTO openings (name, color, pgn) VALUES (?, ?, ?)", (name, color, pgn))
     cur.close()
     conn.commit()
 
@@ -71,10 +70,9 @@ def delete(name, color):
 def load(name, color):
     conn = utils.create_connection(DATABASE_FILE)
     cur = conn.cursor()
-    cur.execute("SELECT tree FROM openings WHERE name = ? AND color = ?", (name, color))
-    tree = cur.fetchone()
-    if tree is None:
+    cur.execute("SELECT pgn FROM openings WHERE name = ? AND color = ?", (name, color))
+    pgn = cur.fetchone()[0]
+    if pgn is None:
         return None
-    tree = pickle.loads(tree[0])
-    op = opening.Opening(name, color, tree)
+    op = opening.from_pgn(name, color, pgn)
     return op

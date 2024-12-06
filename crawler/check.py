@@ -22,9 +22,11 @@ def fromPGN(pgns, player_name, max_deviation):
         if pgn.headers["White"].lower() == player_name.lower():
             color = 1
             repertoire = [copy.deepcopy(op) for op in white]
+            clean_repertoire = white
         elif pgn.headers["Black"].lower() == player_name.lower():
             color = 0
             repertoire = [copy.deepcopy(op) for op in black]
+            clean_repertoire = black
         else:
             raise ValueError("Player name not found in PGN")
         
@@ -43,7 +45,8 @@ def fromPGN(pgns, player_name, max_deviation):
                         deviation_op[j] += 1
                     if not flag and len(possible_moves) > 0:
                         move = i//2 + 1
-                        add_mistake(op, pgn, move, color, white_mistakes, black_mistakes)
+                        clean_op = clean_repertoire[j]
+                        add_mistake(clean_op, pgn, move, color, white_mistakes, black_mistakes)
                 else:
                     flag = move in op.cursor.get_moves()
                     if not flag:
@@ -56,7 +59,7 @@ def fromPGN(pgns, player_name, max_deviation):
     return white_mistakes, black_mistakes
 
 def add_mistake(op, pgn, move, color, white_mistakes, black_mistakes):
-    data = {'name' : op.name, 'color' : op.color, 'node' : copy.deepcopy(op.cursor), 'pgn' : pgn, 'move' : move}
+    data = {'opening' : op, 'node' : copy.deepcopy(op.cursor), 'pgn' : pgn, 'move' : move}
     if color:
         white_mistakes.append(data)
     else:

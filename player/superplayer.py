@@ -23,6 +23,12 @@ class Player:
         self.root.bind("<t>", self.toggle)
         
         self.lock = False
+        
+        self._flag1 = None
+        self._flag2 = None
+    
+    def get_flags(self):
+        return self._flag1, self._flag2
     
     def forward(self, event):
         if len(self.board.board.move_stack) == 0:
@@ -39,27 +45,27 @@ class Player:
         self.root.event_generate("<<MoveBack>>")
 
     def move(self, event, forward):
-        self.root.event_generate("<<ForwardCall>>")
         if self.lock:
             self.board.back()
             return
         
         self.lock = True
         _board  = self.board.board.copy()
-        flag1 = False
-        while not flag1 and len(_board.move_stack) > 0:
-            last_move = _board.pop()
-            flag1 = self.move_confirmation(_board, last_move)
-            if not flag1:
-                self.board.back()
+        last_move = _board.pop()
+        flag1 = self.move_confirmation(_board, last_move)
+        if not flag1:
+            self.board.back()
+            return
         
         move = self.agent_action(forward)
         self.lock = False
         flag2 = move is not None
         if flag2:
-            self.board.push(move)
-        
-        return flag1, flag2
+            self.board.push(move, generateEvent=False)
+            
+        self._flag1 = flag1
+        self._flag2 = flag2
+        self.root.event_generate("<<MoveProcessedBySuperPlayer>>")
     
     def start(self, event, forward):
         move = self.agent_action(forward)

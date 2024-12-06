@@ -1,5 +1,6 @@
 import tkinter as tk
 import chess
+import chess.svg
 
 from .assets import load_chess_pieces as _load_chess_pieces
 from .assets import load_chess_pieces_rect as _load_chess_pieces_rect
@@ -36,10 +37,8 @@ class ChessBoard:
         self._arrow_line = []
         self._persistent_arrow_line = []
         self._circle = []
-        self._highlight = []
         
         self.arrow_coords = []
-        self.highlight_coords = []
         
         self._button3 = None
         
@@ -122,62 +121,57 @@ class ChessBoard:
         self.order_layer()
         self.canvas.update_idletasks()
     
-    def highlight(self, square, fill=None):
-        if fill is None:
-            fill = "red"
-        self.highlight_coords.append(square)
-        x, y = _get_square_pos(square, self.square_size, self.is_flipped, center=True)
-        r = self.square_size//2
-        x -= r
-        y -= r
-        square = self.canvas.create_rectangle(x, y, x+2*r, y+2*r, fill=fill, stipple="gray50", tags="highlight")
-        self._highlight.append(square)
-        self.order_layer()
-    
-    def arrow(self, start, end, persistent=False, fill=None):
-        if fill is None:
-            if not persistent:
-                fill = "orange"
-            else:
-                fill = "blue"
-        self.arrow_coords.append((start, end))
-        start_loc = _get_square_pos(start, self.square_size, self.is_flipped, center=True)
-        end_loc = _get_square_pos(end, self.square_size, self.is_flipped, center=True)
+    def arrow(self, svgArrow, persistent=False):
+        self.arrow_coords.append(svgArrow)
         
-        dx = abs(end_loc[0] - start_loc[0])//self.square_size
-        dy = abs(end_loc[1] - start_loc[1])//self.square_size
-
-        mid = None
-        if (dx, dy) == (1, 2):
-            mid = (start_loc[0], end_loc[1])
-        elif (dx, dy) == (2, 1):
-            mid = (end_loc[0], start_loc[1])
+        start = svgArrow.head
+        end = svgArrow.tail
         
-        if mid is not None:
-            direction_dx = (mid[0] - start_loc[0])//self.square_size
-            direction_dy = (mid[1] - start_loc[1])//self.square_size
+        if start == end:
+            x, y = _get_square_pos(start, self.square_size, self.is_flipped, center=True)
+            r = self.square_size//2
+            x -= r
+            y -= r
+            line = self.canvas.create_rectangle(x, y, x+2*r, y+2*r, fill=svgArrow.color, stipple="gray50", tags="arrow")
+            self.order_layer()
         else:
-            direction_dx = (end_loc[0] - start_loc[0])//self.square_size
-            direction_dy = (end_loc[1] - start_loc[1])//self.square_size
-        
-        start_loc = list(start_loc)
-        if direction_dx < 0:
-            start_loc[0] -= self.square_size/3
-        elif direction_dx > 0:
-            start_loc[0] += self.square_size/3
-        if direction_dy < 0:
-            start_loc[1] -= self.square_size/3
-        elif direction_dy > 0:
-            start_loc[1] += self.square_size/3
+            start_loc = _get_square_pos(start, self.square_size, self.is_flipped, center=True)
+            end_loc = _get_square_pos(end, self.square_size, self.is_flipped, center=True)
             
-        points = [start_loc]
-        if mid is not None:
-            points.append(mid)
-        points.append(end_loc)
-        
-        arrow_width = self.square_size//square_to_arrow_width_ratio
-        arrow_shape = (arrow_width, arrow_width, arrow_width)
-        line = self.canvas.create_line(*points, arrow=tk.LAST, width=arrow_width, arrowshape=arrow_shape, fill=fill, stipple="gray75", tags="arrow")
+            dx = abs(end_loc[0] - start_loc[0])//self.square_size
+            dy = abs(end_loc[1] - start_loc[1])//self.square_size
+
+            mid = None
+            if (dx, dy) == (1, 2):
+                mid = (start_loc[0], end_loc[1])
+            elif (dx, dy) == (2, 1):
+                mid = (end_loc[0], start_loc[1])
+            
+            if mid is not None:
+                direction_dx = (mid[0] - start_loc[0])//self.square_size
+                direction_dy = (mid[1] - start_loc[1])//self.square_size
+            else:
+                direction_dx = (end_loc[0] - start_loc[0])//self.square_size
+                direction_dy = (end_loc[1] - start_loc[1])//self.square_size
+            
+            start_loc = list(start_loc)
+            if direction_dx < 0:
+                start_loc[0] -= self.square_size/3
+            elif direction_dx > 0:
+                start_loc[0] += self.square_size/3
+            if direction_dy < 0:
+                start_loc[1] -= self.square_size/3
+            elif direction_dy > 0:
+                start_loc[1] += self.square_size/3
+                
+            points = [start_loc]
+            if mid is not None:
+                points.append(mid)
+            points.append(end_loc)
+            
+            arrow_width = self.square_size//square_to_arrow_width_ratio
+            arrow_shape = (arrow_width, arrow_width, arrow_width)
+            line = self.canvas.create_line(*points, arrow=tk.LAST, width=arrow_width, arrowshape=arrow_shape, fill=svgArrow.color, stipple="gray75", tags="arrow")
         
         if not persistent:
             self._arrow_line.append(line)
@@ -195,15 +189,11 @@ class ChessBoard:
                 self.canvas.delete(line)
         for circle in self._circle:
             self.canvas.delete(circle)
-        for square in self._highlight:
-            self.canvas.delete(square)
         self._arrow_line = []
         if clear_persistent:
             self._persistent_arrow_line = []
         self._circle = []
-        self._highlight = []
         self.arrow_coords = []
-        self.highlight_coords = []
         
     def _clear(self, event):
         self.clear()
@@ -262,10 +252,8 @@ class ChessBoard:
         if self.locked:
             return
         square = _get_square_from_click(event.x, event.y, self.square_size, self.is_flipped)
-        if self._button3 == square:
-            self.highlight(square)
-        else:
-            self.arrow(self._button3, square)
+        svgArrow = chess.svg.Arrow(square, self._button3, color="orange")
+        self.arrow(svgArrow)
     
     def _motion(self, event):
         if self.locked:
@@ -322,7 +310,7 @@ class ChessBoard:
         self._promotion_move.promotion = None
         self._promotion()
     
-    def push(self, move):
+    def push(self, move, generateEvent=True):
         flag = False
         if self.board.is_legal(move):
             for circle in self._circle:
@@ -337,7 +325,7 @@ class ChessBoard:
                 flag = True
         
         self.draw()
-        if flag:
+        if flag and generateEvent:
             self.root.event_generate("<<MoveConfirmation>>")
         return flag
 

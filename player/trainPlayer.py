@@ -1,5 +1,3 @@
-import time
-
 import agent.humanTrainOpeningAgent
 import board
 import agent
@@ -8,22 +6,16 @@ from .openingPlayer import OpeningPlayer
 
 class TrainPlayer(OpeningPlayer):
     
-    def __init__(self, board: board.ChessBoard, openingName : str, color : bool, load = True):
-        OpeningPlayer.__init__(self, board, openingName, color, load)
-    
-        self.color = color
+    def __init__(self, board: board.ChessBoard, opening, trainedColor):
+        OpeningPlayer.__init__(self, board, opening)
         self.edit_mode = False
         self.anchor_fen = None
 
-        self.root.bind("<<MoveConfirmation>>", self.update_success_rate)
+        self.root.bind("<<MoveProcessedBySuperPlayer>>", self.update_success_rate, add=True)
         self.root.bind("<<Reset>>", self.move_on_reset)
         
-        if self.color:
-            self.whiteAgent = agent.HumanTrainOpeningAgent(self.opening)
-            self.blackAgent = agent.TrainOpeningAgent(self.opening)
-        else:
-            self.whiteAgent = agent.TrainOpeningAgent(self.opening)
-            self.blackAgent = agent.HumanTrainOpeningAgent(self.opening)
+        self.trainedColor = trainedColor
+        self.set_trained_color(trainedColor)
     
     def set_trained_color(self, color):
         self.color = color
@@ -35,7 +27,7 @@ class TrainPlayer(OpeningPlayer):
             self.blackAgent = agent.HumanTrainOpeningAgent(self.opening)
     
     def update_success_rate(self, event):
-        flag1, flag2 = self.forward_draw(event)
+        flag1, flag2 = self.get_flags()
         if len(self.board.board.move_stack) == 0:
             return flag1, flag2
         last_move = self.board.board.peek()

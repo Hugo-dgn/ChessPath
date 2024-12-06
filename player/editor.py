@@ -1,3 +1,5 @@
+import chess.svg
+
 import board
 import agent
 import database
@@ -7,9 +9,9 @@ from .openingPlayer import OpeningPlayer
 
 class Editor(OpeningPlayer):
     
-    def __init__(self, board: board.ChessBoard, openingName : str, color : bool):
-        OpeningPlayer.__init__(self, board, openingName, color)
-        self.root.bind("<<MoveConfirmation>>", self.push)
+    def __init__(self, board: board.ChessBoard, openingName : str):
+        OpeningPlayer.__init__(self, board, openingName)
+        self.root.bind("<<MoveProcessedBySuperPlayer>>", self.push, add=True)
         self.root.bind("<Delete>", self.delete)
         self.root.bind("<Control-s>", self.save)
         self.root.bind("<w>", self.write_annotation)
@@ -21,7 +23,6 @@ class Editor(OpeningPlayer):
         self.opening.root()
         for move in self.board.board.move_stack:
             self.opening.push(move)
-        self.forward_draw(event)
     
     def delete(self, event):
         if len(self.board.board.move_stack) == 0:
@@ -36,8 +37,15 @@ class Editor(OpeningPlayer):
         moves = self.board.board.move_stack
         self.opening.line(moves)
         
-        self.opening.cursor.arrows_annotations = [coord for coord in self.board.arrow_coords]
-        self.opening.cursor.highlight_annotations = [coord for coord in self.board.highlight_coords]
+        annotation = []
+        
+        for arrow in self.board.arrow_coords:
+            start = arrow.head
+            end = arrow.tail
+            annotationArrow = chess.svg.Arrow(end, start, color="green")
+            annotation.append(annotationArrow)
+        
+        self.opening.cursor.arrows_annotations = annotation
         self.display_annotation(event)
     
     def save(self, event):

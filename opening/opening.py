@@ -1,4 +1,6 @@
 import chess
+import chess.pgn
+import io
 
 from .node import Node
 
@@ -81,4 +83,46 @@ class Opening:
         self.cursor = _buffer_cursor1
         other.cursor = _buffer_cursor2
         return flag
+    
+    def get_pgn(self):
+        game = chess.pgn.Game()
+        self.root()
         
+        visited = []
+        
+        def aux(pgnNode, node):
+            if node in visited:
+                return
+            visited.append(node)
+            
+            arrows = node.arrows_annotations
+            pgnNode.set_arrows(arrows)
+            
+            for link in node.children:
+                move = link.move
+                child = link.end
+                child_pgn = pgnNode.add_variation(move)
+                aux(child_pgn, child)
+        
+        aux(game, self.tree)
+        
+        pgn = game.__str__().split("\n")[-1]
+        
+        return pgn
+    
+def from_pgn(name, color, pgn):
+    tree = Node()
+    opening = Opening(name, color, tree)
+    pgn = io.StringIO(pgn)
+    game = chess.pgn.read_game(pgn)
+    
+    def aux(pgnNode, node):
+        arrows = pgnNode.arrows()
+        node.arrows_annotations = arrows
+        for child in pgnNode.variations:
+            move = child.move
+            leaf = node.add_child(move)
+            aux(child, leaf)
+    aux(game, opening.tree)
+    
+    return opening
