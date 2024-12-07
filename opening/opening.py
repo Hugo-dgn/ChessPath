@@ -20,11 +20,12 @@ class Opening:
     
     def line(self, moves : list) -> Node:
         self.root()
+        flag = True
         for move in moves:
             flag = self.move(move)
             if not flag:
-                raise ValueError("The move is not in the opening or is illegal.")
-        return self.cursor
+                break
+        return self.cursor, flag
 
     def push(self, move : chess.Move) -> Node:
         if not self.board.is_legal(move):

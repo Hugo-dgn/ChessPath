@@ -74,7 +74,10 @@ class OpeningPlayer(Player):
     
     def display_annotation(self, event):
         moves = self.board.board.move_stack
-        cursor = self.opening.line(moves)
+        cursor, flag = self.opening.line(moves)
+        
+        if not flag:
+            return
         
         arrows = cursor.arrows_annotations
         

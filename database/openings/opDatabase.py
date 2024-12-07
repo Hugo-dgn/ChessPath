@@ -34,6 +34,19 @@ def openings():
     cur.execute("SELECT name, color FROM openings")
     op = cur.fetchall()
     return op
+
+def set_pgn(name, color, pgn):
+    conn = utils.create_connection(DATABASE_FILE)
+    cur = conn.cursor()
+    cur.execute("UPDATE openings SET pgn = ? WHERE color = ? AND name = ?", (pgn, color, name))
+    conn.commit()
+    
+def get_pgn(name, color):
+    conn = utils.create_connection(DATABASE_FILE)
+    cur = conn.cursor()
+    cur.execute("SELECT pgn FROM openings WHERE name = ? AND color = ?", (name, color))
+    pgn = cur.fetchone()[0]
+    return pgn
     
 
 def save(opening, overwrite=False):
@@ -68,10 +81,7 @@ def delete(name, color):
 
 
 def load(name, color):
-    conn = utils.create_connection(DATABASE_FILE)
-    cur = conn.cursor()
-    cur.execute("SELECT pgn FROM openings WHERE name = ? AND color = ?", (name, color))
-    pgn = cur.fetchone()[0]
+    pgn = get_pgn(name, color)
     if pgn is None:
         return None
     op = opening.from_pgn(name, color, pgn)

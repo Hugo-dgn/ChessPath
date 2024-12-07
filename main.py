@@ -94,6 +94,12 @@ def db_command(args):
             df = df.drop(columns=['pgn'])
             df['color'] = df['color'].replace({1: 'white', 0: 'black'})
             print(df.head())
+        elif args.command == "pgn":
+            if args.pgn_command == "get":
+                pgn = database.openings.get_pgn(args.opening, color)
+                print(pgn)
+            elif args.pgn_command == "set":
+                database.openings.set_pgn(args.opening, color, args.pgn)
         elif args.command == "commit":
             if args.action == "create":
                 op = opening.Opening(args.name, color, opening.Node())
@@ -117,7 +123,7 @@ if __name__ == "__main__":
     player_parser.add_argument("--size", type=int, default=size, help="Size of a square")
     player_parser.set_defaults(func=player_window)
     
-    editor_parser = subparsers.add_parser("editor", help="Opening editor")
+    editor_parser = subparsers.add_parser("edit", help="Opening editor")
     editor_parser.add_argument("opening", type=str, help="name of the opening")
     editor_parser.add_argument("color", type=str, choices=["w", "b"], help="color of the player")
     editor_parser.add_argument("--size", type=int, default=size, help="Size of a square")
@@ -160,6 +166,17 @@ if __name__ == "__main__":
     commit_parser.add_argument("color", type=str, choices=["w", "b"], help="Color of the opening")
     db_parser.set_defaults(func=db_command)
     
+    pgn_parser = db_command_subparsers.add_parser("pgn", help="PGN")
+    pgn_command_subparsers = pgn_parser.add_subparsers(dest="pgn_command")
+    
+    pgn_get_parser = pgn_command_subparsers.add_parser("get", help="Get PGN")
+    pgn_get_parser.add_argument("opening", type=str, help="Name of the opening")
+    pgn_get_parser.add_argument("color", type=str, choices=["w", "b"], help="Color of the opening")
+    
+    pgn_set_parser = pgn_command_subparsers.add_parser("set", help="Set PGN")
+    pgn_set_parser.add_argument("opening", type=str, help="Name of the opening")
+    pgn_set_parser.add_argument("color", type=str, choices=["w", "b"], help="Color of the opening")
+    pgn_set_parser.add_argument("pgn", type=str, help="PGN")
     
     args = parser.parse_args()
     args.func(args)

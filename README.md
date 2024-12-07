@@ -33,6 +33,14 @@ To delete an existing opening, run:
 python main.py db op commit delete <name> <color>
 ```
 
+### List Openings
+
+To list the openings in the database:
+
+```bash
+python main.py db op table
+```
+
 ---
 
 ## Chess Game
@@ -54,7 +62,7 @@ python main.py board
 To edit an opening, use:
 
 ```bash
-python main.py editor <openingName> <color>
+python main.py edit <openingName> <color>
 ```
 
 - **`<openingName>`**: The name of the opening to edit.  
