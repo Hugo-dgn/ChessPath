@@ -25,6 +25,22 @@ python main.py db op commit create <name> <color>
 - **`<name>`**: The name of the opening.  
 - **`<color>`**: The color you play the opening with (`w` for white, `b` for black).
 
+### Set an Opening PGN
+
+To set the PGN for an opening, run:
+
+```bash
+python main.py db op pgn set <name> <color> <pgn>
+```
+
+### Get Opening PGN
+
+To retrieve the PGN for an opening, use:
+
+```bash
+python main.py db op pgn get <name> <color>
+```
+
 ### Delete an Opening
 
 To delete an existing opening, run:
@@ -35,7 +51,7 @@ python main.py db op commit delete <name> <color>
 
 ### List Openings
 
-To list the openings in the database:
+To list all openings in the database:
 
 ```bash
 python main.py db op table
@@ -98,24 +114,28 @@ python main.py train <openingName> <color>
 
 ## Replay Opening Mistakes
 
-You can replay opening mistakes made on chess.com with:
+Replay mistakes from your Chess.com games by running:
 
 ```bash
 python main.py mistakes <user-name> <from-date> <time-control>
 ```
 
 Where:
-- **`<user-name>`**: Your chess.com username.  
+- **`<user-name>`**: Your Chess.com username.  
 - **`<from-date>`**: A date in the format `yyyy-mm-dd` from which you want to analyze your games.  
 - **`<time-control>`**: The time control in seconds or in the format `seconds+increment`.
 
-For example:
+Example:
 
 ```bash
 python main.py mistakes Bob 2024-08-01 600
 ```
 
-This would fetch rapid games played from 2024-08-01 by Bob in 10-minute time control. To go to the next mistake, press `<M>`. To reset the board to the current mistake, press `<m>`. If you want the app to automatically switch to the next mistake once the correct move is input, run:
+This would fetch rapid games played from 2024-08-01 by Bob with a 10-minute time control.  
+
+- To go to the next mistake, press `<M>`.  
+- To reset the board to the current mistake, press `<m>`.  
+- For automatic progression after inputting the correct move, use:
 
 ```bash
 python main.py mistakes <user-name> <from-date> <time-control> --auto-next
@@ -125,24 +145,24 @@ python main.py mistakes <user-name> <from-date> <time-control> --auto-next
 
 ## Train Against Lichess Openings Database
 
-You can train against the most common moves played on Lichess for a given ELO range, position, and time control:
+Train against common moves from the Lichess database for a specified ELO range, position, and time control:
 
 ```bash
 python main.py lichess-sim <color> <min_elo> <max_elo> <time_control> <number_of_moves>
 ```
 
 Where:
-- **`<color>`**: The color you will play as, either `w` or `b`.  
-- **`<min_elo>`**: Minimum ELO of the players in the database.  
-- **`<max_elo>`**: Maximum ELO of the players in the database.  
-- **`<time_control>`**: Time control to filter by (`bullet`, `blitz`, `rapid`, `classical`).  
+- **`<color>`**: The color you will play as (`w` or `b`).  
+- **`<min_elo>`**: Minimum ELO of players in the database.  
+- **`<max_elo>`**: Maximum ELO of players in the database.  
+- **`<time_control>`**: Time control (`bullet`, `blitz`, `rapid`, `classical`).  
 - **`<number_of_moves>`**: Number of the most common moves to consider.
 
-To use this feature effectively:
-1. Press `<t>` to toggle two-player mode.
-2. Input a position of interest.
-3. Press `<t>` again to toggle back.
-4. Press `<a>` to set an anchor to that position.
+### Usage Tips:
+1. Press `<t>` to toggle two-player mode.  
+2. Input a position of interest.  
+3. Press `<t>` again to toggle back.  
+4. Press `<a>` to set an anchor to that position.  
 5. Continue playing, and press `<A>` to return to the anchor.
 
 ---
@@ -155,8 +175,8 @@ To use this feature effectively:
 - **`<s>`**: Show the moves of the opening once.  
 - **`<S>`**: Always show the moves of the opening.  
 - **`<c>`**: Clear all drawings on the board.  
-- **`<W>`**: Show all written annotations for the current position.  
-- **`<t>`**: Toggle between the current mode and two-player mode.  
+- **`<W>`**: Show all annotations for the current position.  
+- **`<t>`**: Toggle two-player mode.  
 - **`<a>`**: Set an anchor at the current position.  
 - **`<A>`**: Jump to the anchor.  
 - **`<Left>`**: Undo the last move.  
