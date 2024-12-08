@@ -24,8 +24,6 @@ class Player:
         self.root.bind("<t>", self.toggle)
         self.root.bind("<l>", self.open_lichess_analysis)
         
-        self.lock = False
-        
         self._flag1 = None
         self._flag2 = None
     
@@ -41,17 +39,10 @@ class Player:
     def back(self, event):
         if len(self.board.board.move_stack) == 0:
             return
-        if self.lock:
-            return
         self.board.back()
         self.root.event_generate("<<MoveBack>>")
 
     def move(self, event, forward):
-        if self.lock:
-            self.board.back()
-            return
-        
-        self.lock = True
         _board  = self.board.board.copy()
         last_move = _board.pop()
         flag1 = self.move_confirmation(_board, last_move)
@@ -60,7 +51,6 @@ class Player:
             return
         
         move = self.agent_action(forward)
-        self.lock = False
         flag2 = move is not None
         if flag2:
             self.board.push(move, generateEvent=False)
@@ -93,7 +83,6 @@ class Player:
     def reset(self, event):
         self.board.reset()
         self.root.event_generate("<<Reset>>")
-        self.lock = False
     
     def anchor(self, event):
         self.anchor_fen = self.board.board.fen()
