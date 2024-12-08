@@ -24,7 +24,8 @@ class OpeningAgent(Agent):
             return None
         if forwardCall:
             node = self.opening.cursor
-            move = self.score_function(node)
+            scores = self.score_function(node)
+            move = max(scores, key=lambda x: x[0])[1]
         else:
             move = random.choice(next_moves)
         return move

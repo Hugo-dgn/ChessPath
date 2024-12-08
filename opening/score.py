@@ -2,24 +2,29 @@ import numpy as np
 
 def depthScore(node):
     links = node.children
-    next_link = max(links, key=lambda link: depth(link.end))
-    next_move = next_link.move
-    return next_move
+    scores  = [(depth(link.end), link.move) for link in links]
+    return scores
 
 def successRateScore(node):
     links = node.children
-    scores = np.array([_min_success_rate(link, []) for link in links])
-    visits = np.array([link.visits for link in links])
-    worst_link = np.min(scores)
+    scores = [(_min_success_rate(link, []), link.move) for link in links]
+    return scores
+
+def visitScore(node):
+    links = node.children
+    scores = [(link.visits, link.move) for link in links]
+    return scores
+
+def agrregationScore(node):
+    depth_scores = depthScore(node)
+    success_rate_scores = successRateScore(node)
+    visit_scores = visitScore(node)
     
-    candidates = scores == worst_link
-    visits[~candidates] = max(visits) + 1
-    
-    next_link_index = np.argmin(visits)
-    next_link = links[next_link_index]
-    
-    next_move = next_link.move
-    return next_move
+    scores = []
+    for depth_score, success_rate_score, visit_score in zip(depth_scores, success_rate_scores, visit_scores):
+        score = (depth_score[0] + (success_rate_score[0] * visit_score[0] + 1e-3), depth_score[1])
+        scores.append(score)
+    return scores
 
 def depth(node):
     return _depth(node, [])
