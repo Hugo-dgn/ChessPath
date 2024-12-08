@@ -113,7 +113,12 @@ class Player:
         self.is_toggle = not self.is_toggle
         
     def open_lichess_analysis(self, event):
-        moves = self.board.board.move_stack
-        pgn = "_".join([str(move) for move in moves])
+        moves = []
+        _board = self.board.board.copy()
+        while len(_board.move_stack) > 0:
+            move = _board.pop()
+            san = _board.san(move)
+            moves.insert(0, san)
+        pgn = "_".join(moves)
         URL =  "https://lichess.org/analysis/pgn/" + pgn
         webbrowser.open(URL)
