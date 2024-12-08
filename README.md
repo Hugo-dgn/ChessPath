@@ -182,6 +182,7 @@ Where:
 - **`<Left>`**: Undo the last move.  
 - **`<Forward>`**: Play the next move automatically.  
 - **`<Space>`**: Show a hint for the next move.
+- **`<l>`** : Open current position in a lichess analysis board.
 
 ### Editor Mode Commands
 

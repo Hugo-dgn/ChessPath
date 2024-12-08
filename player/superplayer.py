@@ -1,5 +1,6 @@
 import board
 import agent
+import webbrowser
 
 class Player:
     def __init__(self, board : board.ChessBoard, whiteAgent : agent.superAgent, blackAgent : agent.superAgent):
@@ -21,6 +22,7 @@ class Player:
         self.root.bind("<a>", self.anchor)
         self.root.bind("<A>", self.go_to_anchor)
         self.root.bind("<t>", self.toggle)
+        self.root.bind("<l>", self.open_lichess_analysis)
         
         self.lock = False
         
@@ -109,3 +111,9 @@ class Player:
             self.whiteAgent = self._whiteAgent
             self.blackAgent = self._blackAgent
         self.is_toggle = not self.is_toggle
+        
+    def open_lichess_analysis(self, event):
+        moves = self.board.board.move_stack
+        pgn = "_".join([str(move) for move in moves])
+        URL =  "https://lichess.org/analysis/pgn/" + pgn
+        webbrowser.open(URL)

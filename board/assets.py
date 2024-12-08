@@ -1,18 +1,18 @@
 from PIL import Image, ImageTk
 import yaml
 
-with open("assets_index.yaml", 'r') as stream:
+with open("config.yaml", 'r') as stream:
     try:
-        assets_index = yaml.safe_load(stream)
+        config = yaml.safe_load(stream)
     except yaml.YAMLError as exc:
         print(exc)
 
 def load_chess_pieces():
-    chess_pieces_path = assets_index['chess_pieces'] + "/image.png"
+    chess_pieces_path = config['chess_pieces'] + "/image.png"
     return Image.open(chess_pieces_path).convert('RGBA')
 
 def load_chess_pieces_rect():
-    chess_pieces_rect_path = assets_index['chess_pieces'] + "/rect.yaml"
+    chess_pieces_rect_path = config['chess_pieces'] + "/rect.yaml"
     with open(chess_pieces_rect_path, 'r') as stream:
         try:
             chess_pieces_rect = yaml.safe_load(stream)
