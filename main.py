@@ -38,7 +38,8 @@ def player_window(args):
     color = args.color == "w"
     chess_board, root = get_board(args)
     op = database.openings.load(args.opening, color)
-    op_player = player.OpeningPlayer(chess_board, op)
+    openingAgent = agent.HumanOpeningAgent(op)
+    op_player = player.OpeningPlayer(chess_board, openingAgent, openingAgent, op)
     root.mainloop()
 
 def editor_window(args):

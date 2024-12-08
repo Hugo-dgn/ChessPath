@@ -7,15 +7,15 @@ from .openingPlayer import OpeningPlayer
 class TrainPlayer(OpeningPlayer):
     
     def __init__(self, board: board.ChessBoard, opening, trainedColor):
-        OpeningPlayer.__init__(self, board, opening)
-        self.edit_mode = False
-        self.anchor_fen = None
+        self.trainedColor = trainedColor
+        self.opening = opening
+        self.whiteAgent = None
+        self.blackAgent = None
+        self.set_trained_color(trainedColor)
+        OpeningPlayer.__init__(self, board, self.whiteAgent, self.blackAgent, opening)
 
         self.root.bind("<<MoveProcessedBySuperPlayer>>", self.update_success_rate, add=True)
         self.root.bind("<<Reset>>", self.move_on_reset)
-        
-        self.trainedColor = trainedColor
-        self.set_trained_color(trainedColor)
     
     def set_trained_color(self, color):
         self.color = color

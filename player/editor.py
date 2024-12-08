@@ -4,20 +4,23 @@ import board
 import agent
 import database
 import database.openings
+import opening
 
 from .openingPlayer import OpeningPlayer
 
 class Editor(OpeningPlayer):
     
-    def __init__(self, board: board.ChessBoard, openingName : str):
-        OpeningPlayer.__init__(self, board, openingName)
+    def __init__(self, board: board.ChessBoard, op : opening.Opening):
+        
+        whiteAgent = agent.EditorOpeningAgent(op)
+        blackAgent = whiteAgent
+        
+        OpeningPlayer.__init__(self, board, whiteAgent, blackAgent, op)
+        
         self.root.bind("<<MoveProcessedBySuperPlayer>>", self.push, add=True)
         self.root.bind("<Delete>", self.delete)
         self.root.bind("<Control-s>", self.save)
         self.root.bind("<w>", self.write_annotation)
-        
-        self.whiteAgent = agent.EditorOpeningAgent(self.opening)
-        self.blackAgent = self.whiteAgent
     
     def push(self, event):
         self.opening.root()

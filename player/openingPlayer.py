@@ -8,11 +8,10 @@ from .superplayer import Player
 
 class OpeningPlayer(Player):
     
-    def __init__(self, board: board.ChessBoard, opening : op.Opening):
+    def __init__(self, board: board.ChessBoard, whiteAgent : agent.superAgent, blackAgent : agent.superAgent, opening : op.Opening):
         self.opening = opening
         
-        whiteAgent = agent.HumanOpeningAgent(self.opening)
-        blackAgent = whiteAgent
+        self.openingAgent = agent.HumanOpeningAgent(self.opening)
         
         Player.__init__(self, board, whiteAgent, blackAgent)
         
@@ -28,7 +27,7 @@ class OpeningPlayer(Player):
         self.root.bind("<<MoveBack>>", self.backward_draw)
 
     def show_moves(self, persistent):
-        moves = self.whiteAgent.possible_actions(self.board.board)
+        moves = self.openingAgent.possible_actions(self.board.board)
         for move in moves:
             start = move.from_square
             end = move.to_square
@@ -63,7 +62,7 @@ class OpeningPlayer(Player):
         self.persistent_show_moves = False
     
     def hint_moves(self, event):
-        moves = self.whiteAgent.possible_actions(self.board.board)
+        moves = self.openingAgent.possible_actions(self.board.board)
         for move in moves:
             start = move.from_square
             arrow = chess.svg.Arrow(start, start, color="red")
