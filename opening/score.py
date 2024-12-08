@@ -56,7 +56,6 @@ def _min_success_rate(link, visited_node):
     child_links = node.children
     next_link_success_rate = 1
     for child_link in child_links:
-        next_node = child_link.end
         next_link_success_rate = min(next_link_success_rate, _min_success_rate(child_link, visited_node + [link.up]))
     
     return link.get_success_rate() * next_link_success_rate

@@ -115,7 +115,7 @@ class Link:
     
     def get_success_rate(self) -> float:
         if self.visits == 0:
-            return 0
+            return 1
         return self.successes / self.visits
     
     def __eq__(self, other):
