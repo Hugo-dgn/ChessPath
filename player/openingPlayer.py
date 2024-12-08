@@ -66,7 +66,8 @@ class OpeningPlayer(Player):
         moves = self.whiteAgent.possible_actions(self.board.board)
         for move in moves:
             start = move.from_square
-            self.board.highlight(start)
+            arrow = chess.svg.Arrow(start, start, color="red")
+            self.board.arrow(arrow)
         
     def _display_annotation(self, event):
         self.show_annotation = not self.show_annotation

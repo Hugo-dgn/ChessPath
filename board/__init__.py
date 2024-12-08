@@ -104,6 +104,7 @@ class ChessBoard:
     def order_layer(self):
         self.canvas.tag_raise("piece")
         self.canvas.tag_raise("arrow")
+        self.canvas.tag_raise("highlight")
     
     def draw(self):
         position = "".join(reversed(self.board.epd().split()[0].split("/")))
@@ -132,7 +133,7 @@ class ChessBoard:
             r = self.square_size//2
             x -= r
             y -= r
-            line = self.canvas.create_rectangle(x, y, x+2*r, y+2*r, fill=svgArrow.color, stipple="gray50", tags="arrow")
+            line = self.canvas.create_rectangle(x, y, x+2*r, y+2*r, fill=svgArrow.color, stipple="gray50", tags="higlight")
             self.order_layer()
         else:
             start_loc = _get_square_pos(start, self.square_size, self.is_flipped, center=True)
