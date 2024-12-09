@@ -66,7 +66,7 @@ def mistakes_window(args):
     print(f"Mistakes found for white : {len(white_mistakes)}")
     print(f"Mistakes found for black : {len(black_mistakes)}")
     print("")
-    base_player = player.MistakePlayer(white_mistakes, black_mistakes, chess_board, args.auto_next)
+    base_player = player.MistakePlayer(white_mistakes, black_mistakes, chess_board, args.auto_next, args.auto_next_eol)
     root.mainloop()
 
 def lichess_sim_window(args):
@@ -149,6 +149,7 @@ if __name__ == "__main__":
     mistakes_parser.add_argument("date", type=str, help="Date")
     mistakes_parser.add_argument("time", type=str, help="Time control")
     mistakes_parser.add_argument("--auto-next", action="store_true", help="Auto next mistake")
+    mistakes_parser.add_argument("--auto-next-eol", action="store_true", help="Auto next mistake at the end of the line")
     mistakes_parser.add_argument("--size", type=int, default=size, help="Size of a square")
     mistakes_parser.set_defaults(func=mistakes_window)
     

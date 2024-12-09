@@ -6,11 +6,12 @@ from .trainPlayer import TrainPlayer
 
 class MistakePlayer(TrainPlayer):
 
-    def __init__(self, white_mistake, black_mistake, board: ChessBoard, auto_next):
+    def __init__(self, white_mistake, black_mistake, board: ChessBoard, auto_next, auto_next_eol):
         self.white_mistake = white_mistake
         self.black_mistake = black_mistake
         
         self.auto_next = auto_next
+        self.auto_next_eol = auto_next_eol
         self.current_mistake = None
         
         TrainPlayer.__init__(self, board, None, None)
@@ -63,8 +64,7 @@ class MistakePlayer(TrainPlayer):
         self.board.clear()
         self.board.reset(flipped=not color)
 
-        self.opening = op
-        self.opening.root()
+        self.set_opening(op)
         self.set_trained_color(color)
 
         self.buffer_white_agent = self.whiteAgent
@@ -86,6 +86,14 @@ class MistakePlayer(TrainPlayer):
 
     def check_auto_next(self, event):
         flag1, flag2 = self.get_flags()
-        if flag1 and self.auto_next:
-            self.next_mistake(None)
+        if flag1:
+            if self.auto_next:
+                self.next_mistake(None)
+            if self.auto_next_eol:
+                if self.color:
+                    next_moves = self.blackAgent.possible_actions(self.board.board)
+                else:
+                    next_moves = self.whiteAgent.possible_actions(self.board.board)
+                if len(next_moves) == 0:
+                    self.next_mistake(None)
         

@@ -25,6 +25,11 @@ class OpeningPlayer(Player):
         self.root.bind("<space>", self.hint_moves)
         self.root.bind("<<MoveProcessedBySuperPlayer>>", self.forward_draw, add=True)
         self.root.bind("<<MoveBack>>", self.backward_draw)
+    
+    def set_opening(self, opening):
+        self.opening = opening
+        self.opening.root()
+        self.openingAgent = agent.HumanOpeningAgent(self.opening)
 
     def show_moves(self, persistent):
         moves = self.openingAgent.possible_actions(self.board.board)
