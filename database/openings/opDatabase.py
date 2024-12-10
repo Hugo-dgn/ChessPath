@@ -1,12 +1,19 @@
-import pickle
+import yaml
 import pandas as pd
+import os
 
 import opening
 import database.utils as utils
 
-DATABASE_FILE = 'database.db'
+with open("config.yaml", "r") as f:
+    config = yaml.safe_load(f)
+DATABASE_FILE = config['database']
+
+print(DATABASE_FILE)
 
 def list_tables():
+    exists = os.path.exists(DATABASE_FILE)
+    print(exists)
     conn = utils.create_connection(DATABASE_FILE)
     rows = utils.list_table(conn)
     return rows
