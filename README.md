@@ -128,7 +128,7 @@ Where:
 Example:
 
 ```bash
-python main.py mistakes Bob 2024-08-01 600
+python main.py mistakes Bob 2024-08-01 --time-control 600
 ```
 
 This would fetch rapid games played from 2024-08-01 by Bob with a 10-minute time control.  
