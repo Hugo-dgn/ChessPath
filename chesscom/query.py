@@ -53,8 +53,9 @@ def fetch_chesscom_games(username, since_date, time_control):
             date = datetime.fromtimestamp(end_time)
             if date < since_date:
                 continue
-            if game['time_control'] == time_control and game.get('rules', 'chess') == 'chess':
-                game_pgn = chess.pgn.read_game(io.StringIO(game["pgn"]))
-                if game_pgn:
-                    filtered_games.append(game_pgn)
+            if  game.get('rules', 'chess') == 'chess':
+                if game['time_control'] == time_control or time_control is None:
+                    game_pgn = chess.pgn.read_game(io.StringIO(game["pgn"]))
+                    if game_pgn:
+                        filtered_games.append(game_pgn)
     return filtered_games

@@ -61,7 +61,7 @@ def train_window(args):
 def mistakes_window(args):
     setattr(args, "fliped", False)
     chess_board, root = get_board(args)
-    pgns = chesscom.fetch_chesscom_games(args.user_name, args.date, args.time)
+    pgns = chesscom.fetch_chesscom_games(args.user_name, args.date, args.time_control)
     white_mistakes, black_mistakes = crawler.fromPGN(pgns, 'hugo_dgn')
     print(f"Mistakes found for white : {len(white_mistakes)}")
     print(f"Mistakes found for black : {len(black_mistakes)}")
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     mistakes_parser = subparsers.add_parser("mistakes", help="Find mistakes in a PGN")
     mistakes_parser.add_argument("user_name", type=str, help="Chess.com user name")
     mistakes_parser.add_argument("date", type=str, help="Date")
-    mistakes_parser.add_argument("time", type=str, help="Time control")
+    mistakes_parser.add_argument("--time-control", type=str, help="Time control")
     mistakes_parser.add_argument("--auto-next", action="store_true", help="Auto next mistake")
     mistakes_parser.add_argument("--auto-next-eol", action="store_true", help="Auto next mistake at the end of the line")
     mistakes_parser.add_argument("--size", type=int, default=size, help="Size of a square")
