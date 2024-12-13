@@ -117,7 +117,7 @@ python main.py train <openingName> <color>
 Replay mistakes from your Chess.com games by running:
 
 ```bash
-python main.py mistakes <user-name> <from-date> <time-control>
+python main.py mistakes <user-name> <from-date> --time-control <time-control>
 ```
 
 Where:
