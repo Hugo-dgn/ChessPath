@@ -1,6 +1,7 @@
 import random
 
 import opening as op
+import utils
 
 from .superAgent import Agent
 
@@ -31,11 +32,10 @@ class OpeningAgent(Agent):
         return move
     
     def possible_actions(self, board):
-        stack = board.move_stack
-        self.opening.root()
-        for move in stack:
-            flag = self.opening.move(move)
-            if not flag:
-                return []
-
-        return self.opening.next()
+        position = utils.get_position(board)
+        if position in self.opening.lookup:
+            node = self.opening.lookup[position]
+            self.opening.cursor = node
+            return node.get_moves()
+        else:
+            return []

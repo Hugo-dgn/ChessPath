@@ -9,11 +9,10 @@ with open("config.yaml", "r") as f:
     config = yaml.safe_load(f)
 DATABASE_FILE = config['database']
 
-print(DATABASE_FILE)
-
 def list_tables():
     exists = os.path.exists(DATABASE_FILE)
-    print(exists)
+    if not exists:
+        raise FileNotFoundError(f"Database file {DATABASE_FILE} not found")
     conn = utils.create_connection(DATABASE_FILE)
     rows = utils.list_table(conn)
     return rows

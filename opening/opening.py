@@ -12,6 +12,24 @@ class Opening:
         self.tree = tree
         self.cursor = tree
         self.board = chess.Board()
+        self.lookup = {}
+        self.compute_lookup()
+    
+    def compute_lookup(self):
+        self.lookup = {}
+        stack = [self.tree]
+        visited = []
+        while len(stack) > 0:
+            node = stack.pop()
+            if node in visited:
+                continue
+            visited.append(node)
+            position = node.get_position()
+            self.lookup[position] = node
+            children = node.get_children()
+            for child in children:
+                if child not in visited:
+                    stack.append(child)
     
     def root(self) -> Node:
         self.cursor = self.tree
@@ -126,4 +144,5 @@ def from_pgn(name, color, pgn):
             aux(child, leaf)
     aux(game, opening.tree)
     
+    opening.compute_lookup()
     return opening

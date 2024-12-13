@@ -1,10 +1,11 @@
+import chess
 from tqdm.auto import tqdm
 import copy
 
 import database
-import database.openings
+import utils
 
-def fromPGN(pgns, player_name, max_deviation):
+def fromPGN(pgns, player_name):
     ops = database.openings.openings()
     
     white_mistakes = []
@@ -13,53 +14,37 @@ def fromPGN(pgns, player_name, max_deviation):
     black = []
     white = []
     for name, color in ops:
+        op = database.openings.load(name, color)
         if color:
-            white.append(database.openings.load(name, color))
+            white.append(op)
         else:
-            black.append(database.openings.load(name, color))
+            black.append(op)
     
     for pgn in tqdm(pgns):
         if pgn.headers["White"].lower() == player_name.lower():
             color = 1
-            repertoire = [copy.deepcopy(op) for op in white]
-            clean_repertoire = white
+            repertoire = white
         elif pgn.headers["Black"].lower() == player_name.lower():
             color = 0
-            repertoire = [copy.deepcopy(op) for op in black]
-            clean_repertoire = black
+            repertoire = black
         else:
             raise ValueError("Player name not found in PGN")
         
-        deviation_op = [0 for _ in range(len(repertoire))]
-        
-        for i, move in enumerate(pgn.mainline_moves()):
-            _ = 1
-            for j, op in enumerate(repertoire):
-                if deviation_op[j] > max_deviation:
-                    continue
-                if (i+1) % 2 == color:
-                    possible_moves = op.cursor.get_moves()
-                    flag = move in possible_moves
-                    op.push(move)
-                    if not flag:
-                        deviation_op[j] += 1
-                    if not flag and len(possible_moves) > 0:
-                        move = i//2 + 1
-                        clean_op = clean_repertoire[j]
-                        add_mistake(clean_op, pgn, move, color, white_mistakes, black_mistakes)
-                else:
-                    flag = move in op.cursor.get_moves()
-                    if not flag:
-                        deviation_op[j] += 1
-                    try:
-                        op.push(move)
-                    except:
-                        _ = 1
-    
+        board = chess.Board()
+        for move in pgn.mainline_moves():
+            position = utils.get_position(board)
+            for op in repertoire:
+                if board.turn == color:
+                    if position in op.lookup:
+                        node = op.lookup[position]
+                        moves = node.get_moves()
+                        if move not in moves and len(moves) > 0:
+                            add_mistake(op, node, pgn, board.fullmove_number, color, white_mistakes, black_mistakes)
+            board.push(move)
     return white_mistakes, black_mistakes
 
-def add_mistake(op, pgn, move, color, white_mistakes, black_mistakes):
-    data = {'opening' : op, 'node' : copy.deepcopy(op.cursor), 'pgn' : pgn, 'move' : move}
+def add_mistake(op, node, pgn, move, color, white_mistakes, black_mistakes):
+    data = {'opening' : op, 'node' : node, 'pgn' : pgn, 'move' : move}
     if color:
         white_mistakes.append(data)
     else:

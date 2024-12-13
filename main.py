@@ -62,7 +62,7 @@ def mistakes_window(args):
     setattr(args, "fliped", False)
     chess_board, root = get_board(args)
     pgns = chesscom.fetch_chesscom_games(args.user_name, args.date, args.time)
-    white_mistakes, black_mistakes = crawler.fromPGN(pgns, 'hugo_dgn', 0)
+    white_mistakes, black_mistakes = crawler.fromPGN(pgns, 'hugo_dgn')
     print(f"Mistakes found for white : {len(white_mistakes)}")
     print(f"Mistakes found for black : {len(black_mistakes)}")
     print("")

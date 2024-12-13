@@ -76,8 +76,6 @@ class Node:
         return [link.move for link in self.children]
     
     def get_position(self) -> str:
-        if not hasattr(self, "_position"):
-            self._position = None
         if self._position is not None:
             return self._position
         board = chess.Board()
