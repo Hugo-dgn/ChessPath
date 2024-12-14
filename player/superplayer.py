@@ -94,8 +94,8 @@ class Player:
     
     def toggle(self, event):
         if not self.is_toggle:
-            self.whiteAgent = agent.Agent()
-            self.blackAgent = agent.Agent()
+            self.whiteAgent = agent.Agent(isHuman=True)
+            self.blackAgent = agent.Agent(isHuman=True)
         else:
             self.whiteAgent = self._whiteAgent
             self.blackAgent = self._blackAgent

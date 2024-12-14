@@ -8,6 +8,7 @@ import database
 import opening
 import chesscom
 import crawler
+import utils
 
 #### default values
 
@@ -74,14 +75,17 @@ def mistakes_window(args):
 def lichess_sim_window(args):
     setattr(args, "fliped", args.color == "b")
     color = args.color == "w"
+    white, black = utils.get_openings()
     if color:
         white_agent = agent.Agent(isHuman=True)
         black_agent = agent.LichessOpeningAgent(args.rating_range, args.time_control, args.number_of_moves)
+        opening_agent = agent.MultiOpeningAgent(white, isHuman=False)
     else:
         white_agent = agent.LichessOpeningAgent(args.rating_range, args.time_control, args.number_of_moves)
         black_agent = agent.Agent(isHuman=False)
+        opening_agent = agent.MultiOpeningAgent(black, isHuman=False)
     chess_board, root = get_board(args)
-    base_player = player.Player(chess_board, white_agent, black_agent)
+    base_player = player.OpeningPlayer(chess_board, white_agent, black_agent, opening_agent)
     root.mainloop()
 
 def db_command(args):
@@ -96,7 +100,7 @@ def db_command(args):
             df = database.openings.table("openings")
             df = df.drop(columns=['pgn'])
             df['color'] = df['color'].replace({1: 'white', 0: 'black'})
-            print(df.head())
+            print(df)
         elif args.command == "pgn":
             if args.pgn_command == "get":
                 pgn = database.openings.get_pgn(args.opening, color)

@@ -28,7 +28,7 @@ class OpeningAgent(Agent):
         return flag
     
     def act(self, board, forwardCall):
-        if self.isHuman:
+        if self.isHuman and not forwardCall:
             move = None
         else:
             position = utils.get_position(board)
