@@ -28,8 +28,9 @@ def fromPGN(pgns, player_name):
                 if move not in moves:
                     position = utils.get_position(board)
                     if position not in mistakes:
-                        mistakes[position] = {"n" : 0, "moves" : []}
+                        mistakes[position] = {"n" : 0, "moves" : [], "staks" : []}
                     mistakes[position]["n"] += 1
                     mistakes[position]["moves"].append(move)
+                    mistakes[position]["staks"].append(board.move_stack.copy())
             board.push(move)
     return mistakes

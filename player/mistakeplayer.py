@@ -19,7 +19,7 @@ class MistakePlayer(OpeningPlayer):
         self.auto_next = auto_next
         self.auto_next_eol = auto_next_eol
         self.current_mistake_fen = None
-        self.current_mistake_moves = None
+        self.current_mistake_moves_data = None
         self.mistake_color = None
         
         white, black = utils.get_openings()
@@ -43,9 +43,17 @@ class MistakePlayer(OpeningPlayer):
     
     def go_to_mistake(self):
         self.board.clear()
-        self.board.reset(fen=self.current_mistake_fen, flipped=not self.mistake_color)
+        self.board.reset(flipped=not self.mistake_color)
         
-        for wrong_move in self.current_mistake_moves:
+        stack = self.current_mistake_moves_data["staks"][0]
+        self.whiteAgent.lock = False
+        self.blackAgent.lock = False
+        for move in stack:
+            self.board.push(move)
+        self.whiteAgent.lock = True
+        self.blackAgent.lock = True
+        
+        for wrong_move in self.current_mistake_moves_data["moves"]:
             start = wrong_move.from_square
             end = wrong_move.to_square
             
@@ -58,7 +66,7 @@ class MistakePlayer(OpeningPlayer):
         fen = mistake[0]
         data = mistake[1]
         self.current_mistake_fen = fen
-        self.current_mistake_moves = data["moves"]
+        self.current_mistake_moves_data = data
         
         if self.current_mistake_fen is None:
             return
