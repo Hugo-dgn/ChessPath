@@ -42,7 +42,6 @@ class OpeningAgent(Agent):
                     y = [score[0] for score in scores]
                     s = sum(y)
                     p = [x/s for x in y]
-                    print(p)
                     move = random.choices(moves, p)[0]
             else:
                 move = None
