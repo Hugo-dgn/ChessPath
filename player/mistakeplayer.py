@@ -1,3 +1,5 @@
+import time
+
 import chess.svg
 import chess
 
@@ -46,12 +48,19 @@ class MistakePlayer(OpeningPlayer):
         self.board.reset(flipped=not self.mistake_color)
         
         stack = self.current_mistake_moves_data["staks"][0]
-        self.whiteAgent.lock = False
-        self.blackAgent.lock = False
+        
+        white_buffer = self.whiteAgent
+        black_buffer = self.blackAgent
+        
+        self.whiteAgent = agent.Agent(isHuman=False)
+        self.blackAgent = agent.Agent(isHuman=False)
+        
         for move in stack:
             self.board.push(move)
-        self.whiteAgent.lock = True
-        self.blackAgent.lock = True
+            time.sleep(0.1)
+            
+        self.whiteAgent = white_buffer
+        self.blackAgent = black_buffer
         
         for wrong_move in self.current_mistake_moves_data["moves"]:
             start = wrong_move.from_square
