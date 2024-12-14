@@ -9,6 +9,8 @@ class Node:
         self.children = []
         self.arrows_annotations = []
         self._position = None
+        self.visits = 0
+        self.success = 0
     
     def _add_child(self, move : chess.Move, leaf : 'Node') -> None:
         link = Link(move, self, leaf)
@@ -108,13 +110,6 @@ class Link:
         self.move = move
         self.up = up
         self.end = down
-        self.visits = 0
-        self.successes = 0
-    
-    def get_success_rate(self) -> float:
-        if self.visits == 0:
-            return 1
-        return self.successes / self.visits
     
     def __eq__(self, other):
         return self.move == other.move

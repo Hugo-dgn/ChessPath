@@ -20,24 +20,32 @@ class OpeningAgent(Agent):
         if not self.lock:
             return True
         moves = self.possible_actions(board)
-        return move in moves
+        flag = move in moves
+        node = self.get_node(board)
+        if node is not None:
+            node.visits += 1
+            node.success += int(flag)
+        return flag
     
     def act(self, board, forwardCall):
-        if forwardCall:
+        if self.isHuman:
+            move = None
+        else:
             position = utils.get_position(board)
             if position in self.opening.lookup:
                 node = self.opening.lookup[position]
                 scores = self.score_function(node)
-                move = max(scores, key=lambda x: x[0])[1]
+                if forwardCall:
+                    move = max(scores, key=lambda x: x[0])[1]
+                else:
+                    moves = [score[1] for score in scores]
+                    y = [score[0] for score in scores]
+                    s = sum(y)
+                    p = [x/s for x in y]
+                    print(p)
+                    move = random.choices(moves, p)[0]
             else:
                 move = None
-        elif self.isHuman:
-            move = None
-        else:
-            next_moves = self.possible_actions(board)
-            if len(next_moves) == 0:
-                return None
-            move = random.choice(next_moves)
         return move
     
     def get_arrows_annotations(self, board):
@@ -47,12 +55,16 @@ class OpeningAgent(Agent):
             return node.arrows_annotations
         else:
             return []
-    
-    def possible_actions(self, board):
+    def get_node(self, board):
         position = utils.get_position(board)
         if position in self.opening.lookup:
-            node = self.opening.lookup[position]
-            self.opening.cursor = node
-            return node.get_moves()
+            return self.opening.lookup[position]
         else:
+            return None
+    
+    def possible_actions(self, board):
+        node = self.get_node(board)
+        if node is None:
             return []
+        self.opening.cursor = node
+        return node.get_moves()

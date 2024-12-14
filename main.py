@@ -55,7 +55,10 @@ def train_window(args):
     color = args.color == "w"
     chess_board, root = get_board(args)
     op = database.openings.load(args.opening, color)
-    train_player = player.TrainPlayer(chess_board, op)
+    whiteAgent = agent.OpeningAgent(op, isHuman=color)
+    blackAgent = agent.OpeningAgent(op, isHuman=not color)
+    openingAgent = agent.OpeningAgent(op, isHuman=False)
+    op_player = player.OpeningPlayer(chess_board, whiteAgent, blackAgent, openingAgent)
     root.mainloop()
     
 def mistakes_window(args):
@@ -72,11 +75,11 @@ def lichess_sim_window(args):
     setattr(args, "fliped", args.color == "b")
     color = args.color == "w"
     if color:
-        white_agent = agent.Agent()
+        white_agent = agent.Agent(isHuman=True)
         black_agent = agent.LichessOpeningAgent(args.rating_range, args.time_control, args.number_of_moves)
     else:
         white_agent = agent.LichessOpeningAgent(args.rating_range, args.time_control, args.number_of_moves)
-        black_agent = agent.Agent()
+        black_agent = agent.Agent(isHuman=False)
     chess_board, root = get_board(args)
     base_player = player.Player(chess_board, white_agent, black_agent)
     root.mainloop()

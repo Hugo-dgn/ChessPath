@@ -8,7 +8,7 @@ import lichess
 class LichessOpeningAgent(Agent):
     
     def __init__(self, rating_range, time_control, number_of_moves):
-        Agent.__init__(self)
+        Agent.__init__(self, isHuman=False)
         self.rating_range = rating_range
         self.time_control = time_control
         self.number_of_moves = number_of_moves

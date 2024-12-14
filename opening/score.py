@@ -1,5 +1,3 @@
-import numpy as np
-
 def depthScore(node):
     links = node.children
     scores  = [(depth(link.end), link.move) for link in links]
