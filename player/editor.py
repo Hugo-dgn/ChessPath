@@ -11,11 +11,13 @@ from .openingPlayer import OpeningPlayer
 class Editor(OpeningPlayer):
     
     def __init__(self, board: board.ChessBoard, op : opening.Opening):
+        self.opening = op
         
-        whiteAgent = agent.EditorOpeningAgent(op)
+        whiteAgent = agent.OpeningAgent(op, isHuman=True, lock=False)
         blackAgent = whiteAgent
+        openingAgent = agent.OpeningAgent(op, isHuman=False)
         
-        OpeningPlayer.__init__(self, board, whiteAgent, blackAgent, op)
+        OpeningPlayer.__init__(self, board, whiteAgent, blackAgent, openingAgent)
         
         self.root.bind("<<MoveProcessedBySuperPlayer>>", self.push, add=True)
         self.root.bind("<Delete>", self.delete)

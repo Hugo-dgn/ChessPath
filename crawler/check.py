@@ -1,25 +1,15 @@
 import chess
 from tqdm.auto import tqdm
-import copy
 
-import database
+import agent
 import utils
 
 def fromPGN(pgns, player_name):
-    ops = database.openings.openings()
     
-    white_mistakes = []
-    black_mistakes = []
+    mistakes = {}
     
-    black = []
-    white = []
-    for name, color in ops:
-        op = database.openings.load(name, color)
-        if color:
-            white.append(op)
-        else:
-            black.append(op)
-    
+    white, black = utils.get_openings()
+
     for pgn in tqdm(pgns):
         if pgn.headers["White"].lower() == player_name.lower():
             color = 1
@@ -31,21 +21,15 @@ def fromPGN(pgns, player_name):
             raise ValueError("Player name not found in PGN")
         
         board = chess.Board()
+        multiAgent = agent.MultiOpeningAgent(repertoire, isHuman=False)
         for move in pgn.mainline_moves():
-            position = utils.get_position(board)
-            for op in repertoire:
-                if board.turn == color:
-                    if position in op.lookup:
-                        node = op.lookup[position]
-                        moves = node.get_moves()
-                        if move not in moves and len(moves) > 0:
-                            add_mistake(op, node, pgn, board.fullmove_number, color, white_mistakes, black_mistakes)
+            moves = multiAgent.possible_actions(board)
+            if len(moves) > 0 and board.turn == color:
+                if move not in moves:
+                    position = utils.get_position(board)
+                    if position not in mistakes:
+                        mistakes[position] = {"n" : 0, "moves" : []}
+                    mistakes[position]["n"] += 1
+                    mistakes[position]["moves"].append(move)
             board.push(move)
-    return white_mistakes, black_mistakes
-
-def add_mistake(op, node, pgn, move, color, white_mistakes, black_mistakes):
-    data = {'opening' : op, 'node' : node, 'pgn' : pgn, 'move' : move}
-    if color:
-        white_mistakes.append(data)
-    else:
-        black_mistakes.append(data)
+    return mistakes

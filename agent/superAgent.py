@@ -1,7 +1,7 @@
 class Agent:
     
-    def __init__(self):
-        pass
+    def __init__(self, isHuman):
+        self.isHuman = isHuman
     
     def act(self, board, forwardCall):
         pass

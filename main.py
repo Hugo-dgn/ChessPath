@@ -38,8 +38,8 @@ def player_window(args):
     color = args.color == "w"
     chess_board, root = get_board(args)
     op = database.openings.load(args.opening, color)
-    openingAgent = agent.HumanOpeningAgent(op)
-    op_player = player.OpeningPlayer(chess_board, openingAgent, openingAgent, op)
+    openingAgent = agent.OpeningAgent(op, isHuman=True)
+    op_player = player.OpeningPlayer(chess_board, openingAgent, openingAgent, openingAgent)
     root.mainloop()
 
 def editor_window(args):
@@ -55,18 +55,17 @@ def train_window(args):
     color = args.color == "w"
     chess_board, root = get_board(args)
     op = database.openings.load(args.opening, color)
-    train_player = player.TrainPlayer(chess_board, op, color)
+    train_player = player.TrainPlayer(chess_board, op)
     root.mainloop()
     
 def mistakes_window(args):
     setattr(args, "fliped", False)
     chess_board, root = get_board(args)
     pgns = chesscom.fetch_chesscom_games(args.user_name, args.date, args.time_control)
-    white_mistakes, black_mistakes = crawler.fromPGN(pgns, 'hugo_dgn')
-    print(f"Mistakes found for white : {len(white_mistakes)}")
-    print(f"Mistakes found for black : {len(black_mistakes)}")
+    mistakes = crawler.fromPGN(pgns, 'hugo_dgn')
+    print(f"Mistakes found: {len(mistakes)}")
     print("")
-    base_player = player.MistakePlayer(white_mistakes, black_mistakes, chess_board, args.auto_next, args.auto_next_eol)
+    base_player = player.MistakePlayer(mistakes, chess_board, args.auto_next, args.auto_next_eol)
     root.mainloop()
 
 def lichess_sim_window(args):

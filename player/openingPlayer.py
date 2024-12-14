@@ -2,16 +2,14 @@ import chess.svg
 
 import board
 import agent
-import opening as op
 
 from .superplayer import Player
 
 class OpeningPlayer(Player):
     
-    def __init__(self, board: board.ChessBoard, whiteAgent : agent.superAgent, blackAgent : agent.superAgent, opening : op.Opening):
-        self.opening = opening
+    def __init__(self, board: board.ChessBoard, whiteAgent : agent.superAgent, blackAgent : agent.superAgent, openingAgent : agent.superAgent):
         
-        self.openingAgent = agent.HumanOpeningAgent(self.opening)
+        self.openingAgent = openingAgent
         
         Player.__init__(self, board, whiteAgent, blackAgent)
         
@@ -78,13 +76,7 @@ class OpeningPlayer(Player):
         self.display_annotation(event)
     
     def display_annotation(self, event):
-        moves = self.board.board.move_stack
-        cursor, flag = self.opening.line(moves)
-        
-        if not flag:
-            return
-        
-        arrows = cursor.arrows_annotations
+        arrows = self.openingAgent.get_arrow_annotations(self.board.board)
         
         for arrow in arrows:
             self.board.arrow(arrow)

@@ -1,23 +1,36 @@
 import chess.svg
+import chess
+
+import utils
 
 from board import ChessBoard
 import agent
-from .trainPlayer import TrainPlayer
+from .openingPlayer import OpeningPlayer
 
-class MistakePlayer(TrainPlayer):
+class MistakePlayer(OpeningPlayer):
 
-    def __init__(self, white_mistake, black_mistake, board: ChessBoard, auto_next, auto_next_eol):
-        self.white_mistake = white_mistake
-        self.black_mistake = black_mistake
+    def __init__(self, mistakes, board: ChessBoard, auto_next, auto_next_eol):
+        
+        mistakes = [(key, mistakes[key]) for key in mistakes]
+        self.mistakes = sorted(mistakes, key=lambda x: x[1]["n"])
+        
+        self.number_of_mistakes = len(self.mistakes)
         
         self.auto_next = auto_next
         self.auto_next_eol = auto_next_eol
-        self.current_mistake = None
+        self.current_mistake_fen = None
+        self.current_mistake_moves = None
+        self.mistake_color = None
         
-        TrainPlayer.__init__(self, board, None, None)
+        white, black = utils.get_openings()
         
-        self.buffer_white_agent = self.whiteAgent
-        self.buffer_black_agent = self.blackAgent
+        self.whiteAgentHuman = agent.MultiOpeningAgent(white, isHuman=True)
+        self.whiteAgentTrain = agent.MultiOpeningAgent(white, isHuman=False)
+        
+        self.blackAgentHuman = agent.MultiOpeningAgent(black, isHuman=True)
+        self.blackAgentTrain = agent.MultiOpeningAgent(black, isHuman=False)
+        
+        OpeningPlayer.__init__(self, board, None, None, None)
         
         self.root.bind("<M>", self.next_mistake)
         self.root.bind("<m>", lambda event : self.go_to_mistake())
@@ -29,60 +42,52 @@ class MistakePlayer(TrainPlayer):
         self.next_mistake(None)
     
     def go_to_mistake(self):
-        self.board.reset()
-        pgn_agent = agent.pgnAgent.PgnAgent(self.current_mistake['pgn'])
-        self.whiteAgent = pgn_agent
-        self.blackAgent = pgn_agent
+        self.board.clear()
+        self.board.reset(fen=self.current_mistake_fen, flipped=not self.mistake_color)
         
-        mistake_move = self.current_mistake['move']
-        color = self.opening.color
-        
-        for _ in range(2*mistake_move-color-1):
-            move = pgn_agent.act(self.board.board, True)
-            self.board.push(move, generateEvent=False)
+        for wrong_move in self.current_mistake_moves:
+            start = wrong_move.from_square
+            end = wrong_move.to_square
             
-        self.whiteAgent = self.buffer_white_agent
-        self.blackAgent = self.buffer_black_agent
-        
-        wrong_move = pgn_agent.act(self.board.board, True)
-        start = wrong_move.from_square
-        end = wrong_move.to_square
-        
-        arrow = chess.svg.Arrow(end, start, color="red")
-        self.board.arrow(arrow, persistent=True)
+            arrow = chess.svg.Arrow(end, start, color="red")
+            self.board.arrow(arrow, persistent=True)
 
     def next_mistake(self, event):
         self.lock_auto_next = True
-        self.current_mistake = self.get_next_mistake()
+        mistake = self.get_next_mistake()
+        fen = mistake[0]
+        data = mistake[1]
+        self.current_mistake_fen = fen
+        self.current_mistake_moves = data["moves"]
         
-        if self.current_mistake is None:
+        if self.current_mistake_fen is None:
             return
         
-        op = self.current_mistake['opening']
-        color = op.color
+        board = chess.Board(fen=self.current_mistake_fen)
+        self.mistake_color = board.turn
         
-        self.board.clear()
-        self.board.reset(flipped=not color)
-
-        self.set_opening(op)
-        self.set_trained_color(color)
-
-        self.buffer_white_agent = self.whiteAgent
-        self.buffer_black_agent = self.blackAgent
+        if self.mistake_color:
+            self.whiteAgent = self.whiteAgentHuman
+            self.blackAgent = self.whiteAgentTrain
+            self.openingAgent = self.whiteAgentTrain
+        else:
+            self.whiteAgent = self.blackAgentTrain
+            self.blackAgent = self.blackAgentHuman
+            self.openingAgent = self.blackAgentTrain
+        
+        
+        ops = self.openingAgent.get_valid_openings(board)
+        names = [op.name for op in ops]
+        names = ", ".join(names)
+        print(f"({self.number_of_mistakes - len(self.mistakes)}/{self.number_of_mistakes}) : {data['n']} mistakes in {names}")
         
         self.go_to_mistake()
     
     def get_next_mistake(self):
-        mistake = None
-        if len(self.white_mistake) > 0:
-            mistake = self.white_mistake.pop()
-        elif len(self.black_mistake) > 0:
-            mistake = self.black_mistake.pop()
-        else:
-            print("\nNo more mistakes")
+        if len(self.mistakes) == 0:
             return None
-        print(f"{mistake['pgn'].headers['Link']} ; move {mistake['move']} ; {mistake['opening'].name}")
-        return mistake
+        else:
+            return self.mistakes.pop()
 
     def check_auto_next(self, event):
         flag1, flag2 = self.get_flags()
@@ -90,7 +95,7 @@ class MistakePlayer(TrainPlayer):
             if self.auto_next:
                 self.next_mistake(None)
             if self.auto_next_eol:
-                if self.color:
+                if self.mistake_color:
                     next_moves = self.blackAgent.possible_actions(self.board.board)
                 else:
                     next_moves = self.whiteAgent.possible_actions(self.board.board)

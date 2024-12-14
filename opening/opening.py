@@ -35,15 +35,6 @@ class Opening:
         self.cursor = self.tree
         self.board = chess.Board()
         return self.tree
-    
-    def line(self, moves : list) -> Node:
-        self.root()
-        flag = True
-        for move in moves:
-            flag = self.move(move)
-            if not flag:
-                break
-        return self.cursor, flag
 
     def push(self, move : chess.Move) -> Node:
         if not self.board.is_legal(move):
@@ -51,6 +42,9 @@ class Opening:
         self.board.push(move)
         self.cursor.add_child(move)
         self.cursor = self.cursor.push(move)
+        position = self.cursor.get_position()
+        if position not in self.lookup:
+            self.lookup[position] = self.cursor
         return self.cursor
 
     def pop(self) -> Node:
