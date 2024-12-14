@@ -72,6 +72,8 @@ class MistakePlayer(OpeningPlayer):
     def next_mistake(self, event):
         self.lock_auto_next = True
         mistake = self.get_next_mistake()
+        if mistake is None:
+            return
         fen = mistake[0]
         data = mistake[1]
         self.current_mistake_fen = fen
