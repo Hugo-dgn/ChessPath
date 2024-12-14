@@ -35,7 +35,9 @@ class OpeningAgent(Agent):
             if position in self.opening.lookup:
                 node = self.opening.lookup[position]
                 scores = self.score_function(node)
-                if forwardCall:
+                if len(scores) == 0:
+                    move = None
+                elif forwardCall:
                     move = max(scores, key=lambda x: x[0])[1]
                 else:
                     moves = [score[1] for score in scores]
