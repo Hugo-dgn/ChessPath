@@ -76,7 +76,7 @@ class OpeningPlayer(Player):
         self.display_annotation(event)
     
     def display_annotation(self, event):
-        arrows = self.openingAgent.get_arrow_annotations(self.board.board)
+        arrows = self.openingAgent.get_arrows_annotations(self.board.board)
         
         for arrow in arrows:
             self.board.arrow(arrow)

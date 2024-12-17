@@ -46,10 +46,10 @@ class MultiOpeningAgent(Agent):
                 return True
         return False
     
-    def get_arrow_annotations(self, board):
+    def get_arrows_annotations(self, board):
         annotations = []
         for agent in self.agents:
-            annotations += agent.get_arrow_annotations(board)
+            annotations += agent.get_arrows_annotations(board)
         return annotations
 
     

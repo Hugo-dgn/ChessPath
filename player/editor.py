@@ -5,6 +5,7 @@ import agent
 import database
 import database.openings
 import opening
+import utils
 
 from .openingPlayer import OpeningPlayer
 
@@ -39,8 +40,8 @@ class Editor(OpeningPlayer):
         self.back(event)
     
     def write_annotation(self, event):
-        moves = self.board.board.move_stack
-        self.opening.line(moves)
+        position = utils.get_position(self.board.board)
+        node = self.opening.lookup[position]
         
         annotation = []
         
@@ -50,7 +51,7 @@ class Editor(OpeningPlayer):
             annotationArrow = chess.svg.Arrow(end, start, color="green")
             annotation.append(annotationArrow)
         
-        self.opening.cursor.arrows_annotations = annotation
+        node.arrows_annotations = annotation
         self.display_annotation(event)
     
     def save(self, event):
