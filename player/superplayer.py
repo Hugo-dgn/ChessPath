@@ -26,6 +26,8 @@ class Player:
         
         self._flag1 = None
         self._flag2 = None
+        
+        self.anchor_move_stack = []
     
     def get_flags(self):
         return self._flag1, self._flag2
@@ -85,12 +87,10 @@ class Player:
         self.root.event_generate("<<Reset>>")
     
     def anchor(self, event):
-        self.anchor_fen = self.board.board.fen()
+        self.anchor_move_stack = self.board.board.move_stack.copy()
         
     def go_to_anchor(self, event):
-        if self.anchor_fen is None:
-            return
-        self.board.reset(self.anchor_fen)
+        self.board.reset(move_stack=self.anchor_move_stack)
     
     def toggle(self, event):
         if not self.is_toggle:

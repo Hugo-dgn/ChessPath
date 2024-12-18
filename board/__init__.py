@@ -338,13 +338,17 @@ class ChessBoard:
         self.is_flipped = not self.is_flipped
         self.draw()
     
-    def reset(self, fen=None, flipped=None):
+    def reset(self, fen=None, flipped=None, move_stack=None):
         if fen is not None:
             self.board.set_fen(fen)
         else:
             self.board.reset()
         if flipped is not None:
             self.is_flipped = flipped
+        
+        if move_stack is not None:
+            for move in move_stack:
+                self.board.push(move)
         self.draw()
 
 def _draw_board(root, case_size):
